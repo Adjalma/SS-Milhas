@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 
 const NeuralParticles = () => {
   const canvasRef = useRef(null);
@@ -145,7 +145,7 @@ const NeuralParticles = () => {
   };
 
   // Loop de animação
-  const animate = () => {
+  const animate = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -165,10 +165,10 @@ const NeuralParticles = () => {
 
     // Continuar animação
     animationIdRef.current = requestAnimationFrame(animate);
-  };
+  }, [dimensions]);
 
   // Configurar canvas
-  const setupCanvas = () => {
+  const setupCanvas = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -182,7 +182,7 @@ const NeuralParticles = () => {
     particlesRef.current = createParticles(width, height);
     setIsInitialized(true);
     animate();
-  };
+  }, [animate]);
 
   // Event handlers
   const handleMouseMove = (event) => {
@@ -248,7 +248,7 @@ const NeuralParticles = () => {
         animate();
       }
     }
-  }, [isInitialized, dimensions]);
+  }, [isInitialized, dimensions, animate]);
 
   // Effect adicional para garantir que as partículas sempre apareçam
   useEffect(() => {
@@ -282,7 +282,7 @@ const NeuralParticles = () => {
     // Reinicializa após um pequeno delay para garantir que o DOM esteja pronto
     const timeout = setTimeout(forceRestart, 200);
     return () => clearTimeout(timeout);
-  }, []); // Executa apenas uma vez quando o componente é montado
+  }, [animate]); // Executa apenas uma vez quando o componente é montado
 
   return (
     <canvas
