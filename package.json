@@ -1,0 +1,30 @@
+{
+  "name": "gestao-milhas-completa",
+  "version": "1.0.0",
+  "description": "Sistema completo de gestão de milhas aéreas com funcionalidades avançadas",
+  "main": "server/index.js",
+  "scripts": {
+    "setup": "chmod +x scripts/*.sh && ./scripts/setup.sh",
+    "setup-deploy": "scripts/deploy-setup.bat",
+    "dev": "npm run server & npm run client",
+    "dev:ai": "npm run server & npm run client & npm run ai:dev",
+    "start": "cd server && npm start",
+    "build": "cd client && npm run build",
+    "server": "cd server && npm run dev",
+    "client": "cd client && npm start",
+    "ai:install": "cd server/ai && py -3.11 -m pip install -r requirements.txt",
+    "ai:start": "cd server/ai && py -3.11 start_ai_system.py",
+    "ai:dev": "cd server/ai && py -3.11 -m uvicorn api:app --reload --host 0.0.0.0 --port 8000",
+    "install-all": "npm install && cd server && npm install && cd ../client && npm install",
+    "clean": "rmdir /s /q node_modules server\\node_modules client\\node_modules client\\build 2>nul || echo Cleaned",
+    "test": "cd server && npm test && cd ../client && npm test",
+    "lint": "cd server && npm run lint && cd ../client && npm run lint",
+    "format": "cd server && npm run format && cd ../client && npm run format"
+  },
+  "keywords": ["milhas", "gestão", "aéreas", "fidelidade", "sistema"],
+  "author": "Especialista em Sistemas",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
