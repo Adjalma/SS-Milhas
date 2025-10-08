@@ -1,47 +1,32 @@
 {
-  "name": "gestao-milhas-server",
+  "name": "ss-milhas-server",
   "version": "1.0.0",
-  "description": "Backend para sistema de gestão de milhas aéreas",
+  "description": "Servidor backend para SS Milhas com integração WhatsApp",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "test": "jest",
-    "seed": "node scripts/seedDatabase.js",
-    "ai:install": "cd ai && pip install -r requirements.txt",
-    "ai:start": "cd ai && python start_ai_system.py",
-    "ai:dev": "cd ai && python -m uvicorn api:app --reload --host 0.0.0.0 --port 8000"
+    "seed:cpf": "node scripts/seedCPFControl.js",
+    "seed:programs": "node scripts/seedPrograms.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "keywords": [
+    "whatsapp",
+    "api",
+    "nodejs",
+    "express"
+  ],
+  "author": "SS Milhas",
+  "license": "ISC",
   "dependencies": {
     "express": "^4.18.2",
-    "mongoose": "^7.5.0",
-    "bcryptjs": "^2.4.3",
-    "jsonwebtoken": "^9.0.2",
     "cors": "^2.8.5",
-    "helmet": "^7.0.0",
-    "morgan": "^1.10.0",
-    "dotenv": "^16.3.1",
-    "express-rate-limit": "^6.10.0",
-    "express-validator": "^7.0.1",
-    "multer": "^1.4.5-lts.1",
-    "node-cron": "^3.0.2",
-    "axios": "^1.5.0",
-    "nodemailer": "^6.9.4",
-    "compression": "^1.7.4",
-    "express-mongo-sanitize": "^2.2.0",
-    "xss": "^1.0.14",
-    "moment": "^2.29.4",
-    "lodash": "^4.17.21",
-    "uuid": "^9.0.0",
-    "pdfkit": "^0.13.0",
-    "exceljs": "^4.4.0"
+    "dotenv": "^16.3.1"
   },
   "devDependencies": {
-    "nodemon": "^3.0.1",
-    "jest": "^29.6.2",
-    "supertest": "^6.3.3"
+    "nodemon": "^3.0.1"
   },
-  "keywords": ["milhas", "backend", "api", "gestão"],
-  "author": "Especialista em Sistemas",
-  "license": "MIT"
+  "engines": {
+    "node": ">=14.0.0"
+  }
 }

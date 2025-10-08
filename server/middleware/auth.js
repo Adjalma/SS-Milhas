@@ -77,9 +77,9 @@ const authMiddleware = async (req, res, next) => {
     req.user = user;
     req.userId = user._id;
     
-    // Atualizar último login
+    // Atualizar último login (sem bloquear a requisição)
     user.estatisticas.ultimoLogin = new Date();
-    await user.save();
+    user.save().catch(err => console.error('Erro ao atualizar último login:', err));
 
     next();
   } catch (error) {

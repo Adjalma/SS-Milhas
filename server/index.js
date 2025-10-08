@@ -23,6 +23,7 @@ require('dotenv').config();
 // Importar modelos
 require('./models/User');
 require('./models/Account');
+require('./models/CPFControl');
 
 // Importar rotas
 const authRoutes = require('./routes/auth');
@@ -32,6 +33,8 @@ const transactionRoutes = require('./routes/transactions');
 const dashboardRoutes = require('./routes/dashboard');
 const reportRoutes = require('./routes/reports');
 const notificationRoutes = require('./routes/notifications');
+const programRoutes = require('./routes/programs');
+const cpfControlRoutes = require('./routes/cpfControl');
 
 // Importar middlewares
 const { errorHandler } = require('./middleware/errorHandler');
@@ -158,6 +161,8 @@ app.use('/api/transactions', authMiddleware, transactionRoutes);
 app.use('/api/dashboard', authMiddleware, dashboardRoutes);
 app.use('/api/reports', authMiddleware, reportRoutes);
 app.use('/api/notifications', authMiddleware, notificationRoutes);
+app.use('/api/programs', authMiddleware, programRoutes);
+app.use('/api/cpf-control', authMiddleware, cpfControlRoutes);
 
 // Rota para servir o frontend em produção
 if (process.env.NODE_ENV === 'production') {
