@@ -287,8 +287,8 @@ const Accounts = () => {
   if (loading) {
     return (
       <Layout>
-        <Box sx={{ p: 3 }}>
-          <Grid container spacing={3}>
+        <Box>
+          <Grid container spacing={2}>
             {[...Array(4)].map((_, index) => (
               <Grid item xs={12} sm={6} md={4} key={index}>
                 <Card>
@@ -308,7 +308,7 @@ const Accounts = () => {
 
   return (
     <Layout>
-      <Box sx={{ p: 3 }}>
+      <Box sx={{ p: 2 }}>
         {/* Header */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
           <Box>
@@ -335,7 +335,7 @@ const Accounts = () => {
         </Box>
 
         {/* Estatísticas */}
-        <Grid container spacing={3} sx={{ mb: 4 }}>
+        <Grid container spacing={2} sx={{ mb: 4 }}>
           <Grid item xs={12} sm={6} md={3}>
             <Card>
               <CardContent>
@@ -418,7 +418,7 @@ const Accounts = () => {
         </Grid>
 
         {/* Lista de Contas */}
-        <Grid container spacing={3}>
+        <Grid container spacing={2}>
           {accounts.map((account) => {
             const variation = getVariation(account.saldo, account.saldoAnterior);
             const progress = calculateProgress(account.saldo, account.meta);

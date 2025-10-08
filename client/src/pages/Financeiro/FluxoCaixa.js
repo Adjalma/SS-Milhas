@@ -203,7 +203,7 @@ const FluxoCaixa = () => {
 
   if (loading) {
     return (
-      <Box sx={{ p: 3 }}>
+      <Box sx={{ p: 2 }}>
         <LinearProgress />
         <Typography variant="h6" sx={{ mt: 2 }}>
           Carregando fluxo de caixa...
@@ -213,7 +213,7 @@ const FluxoCaixa = () => {
   }
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 2 }}>
       {/* Header */}
       <Box sx={{ mb: 4 }}>
         <Typography variant="h4" sx={{ fontWeight: 700, color: 'primary.main', mb: 1 }}>
@@ -225,7 +225,7 @@ const FluxoCaixa = () => {
       </Box>
 
       {/* Resumo Financeiro */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
+      <Grid container spacing={2} sx={{ mb: 4 }}>
         <Grid item xs={12} sm={6} md={2.4}>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -558,7 +558,7 @@ const FluxoCaixa = () => {
         </DialogTitle>
         <DialogContent>
           {selectedItem && (
-            <Grid container spacing={3}>
+            <Grid container spacing={2}>
               <Grid item xs={12} md={6}>
                 <Typography variant="h6" sx={{ mb: 2 }}>Informações Gerais</Typography>
                 <List>

@@ -10,7 +10,9 @@
 
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { Box } from '@mui/material';
+import { Box, ThemeProvider } from '@mui/material';
+import CssBaseline from '@mui/material/CssBaseline';
+import theme from './theme/theme';
 
 import { useAuth } from './contexts/AuthContext';
 import Layout from './components/Layout/Layout';
@@ -26,6 +28,8 @@ import VerifyEmail from './pages/Auth/VerifyEmail';
 
 // Páginas principais
 import Dashboard from './pages/Dashboard/Dashboard';
+import ControleProgramas from './pages/Dashboard/ControleProgramas';
+import MonitoramentoCPF from './pages/Dashboard/ControleCPF';
 import Accounts from './pages/Accounts/Accounts';
 import AccountDetail from './pages/Accounts/AccountDetail';
 import Transactions from './pages/Transactions/Transactions';
@@ -129,9 +133,11 @@ function App() {
   }
 
   return (
-    <ErrorBoundary>
-      <Router>
-        <Box sx={{ display: 'flex', minHeight: '100vh' }}>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <ErrorBoundary>
+        <Router>
+          <Box sx={{ display: 'flex', minHeight: '100vh' }}>
           <Routes>
             {/* Rotas públicas */}
             <Route
@@ -184,6 +190,8 @@ function App() {
                     <Routes>
                       <Route path="/" element={<Navigate to="/dashboard" replace />} />
                       <Route path="/dashboard" element={<Dashboard />} />
+                      <Route path="/dashboard/controle-programas" element={<ControleProgramas />} />
+                      <Route path="/dashboard/monitoramento-cpf" element={<MonitoramentoCPF />} />
                       
                       {/* Contas */}
                       <Route path="/accounts" element={<Accounts />} />
@@ -267,9 +275,10 @@ function App() {
               }
             />
           </Routes>
-        </Box>
-      </Router>
-    </ErrorBoundary>
+          </Box>
+        </Router>
+      </ErrorBoundary>
+    </ThemeProvider>
   );
 }
 

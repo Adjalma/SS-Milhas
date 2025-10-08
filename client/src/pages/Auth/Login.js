@@ -23,6 +23,9 @@ import {
   Divider,
   Paper,
   CircularProgress,
+  Stack,
+  Avatar,
+  Chip
 } from '@mui/material';
 import {
   Visibility,
@@ -30,6 +33,9 @@ import {
   Email,
   Lock,
   FlightTakeoff,
+  Security,
+  Storage,
+  NetworkCheck
 } from '@mui/icons-material';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -54,7 +60,6 @@ const schema = yup.object({
 const Login = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
-  
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -95,7 +100,7 @@ const Login = () => {
       sx={{
         width: '100vw',
         height: '100vh',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: 'linear-gradient(135deg, #0A0B1E 0%, #1A1B2E 100%)',
         padding: 0,
         margin: 0,
         position: 'relative',
@@ -103,106 +108,155 @@ const Login = () => {
       }}
     >
       <NeuralParticles />
+      
       <Box sx={{
         position: 'absolute',
         top: '50%',
         left: '50%',
         transform: 'translate(-50%, -50%)',
+        zIndex: 2,
         width: '100%',
         maxWidth: 400,
-        padding: 2
+        px: 2
       }}>
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+          initial={{ opacity: 0, scale: 0.8, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.8, type: "spring", stiffness: 100 }}
         >
           <Paper
-            elevation={10}
+            elevation={24}
             sx={{
               borderRadius: 3,
               overflow: 'hidden',
-              width: '100%',
-              display: 'flex',
-              flexDirection: 'column'
+              background: 'linear-gradient(145deg, rgba(26, 27, 46, 0.95) 0%, rgba(37, 39, 65, 0.95) 100%)',
+              backdropFilter: 'blur(20px)',
+              border: '1px solid rgba(0, 212, 255, 0.2)',
+              boxShadow: '0 25px 50px -12px rgba(0, 212, 255, 0.25)',
             }}
           >
             {/* Header */}
-            <Box
-              sx={{
-                background: 'linear-gradient(45deg, #3B82F6, #10B981)',
-                color: 'white',
-                p: 2,
-                textAlign: 'center',
-              }}
-            >
-              <FlightTakeoff sx={{ fontSize: 40, mb: 1 }} />
-            <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5 }}>
-              SS Milhas
-            </Typography>
-            <Typography variant="body2" sx={{ opacity: 0.9 }}>
-              Sistema completo de gestão de milhas aéreas
-            </Typography>
+            <Box sx={{ 
+              p: 3, 
+              textAlign: 'center',
+              borderBottom: '1px solid rgba(99, 102, 241, 0.1)',
+              background: 'linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(99, 102, 241, 0.1) 100%)'
+            }}>
+              <Stack direction="row" alignItems="center" justifyContent="center" spacing={2} mb={2}>
+                <Avatar
+                  sx={{
+                    bgcolor: 'linear-gradient(135deg, #00D4FF 0%, #6366F1 100%)',
+                    width: 48,
+                    height: 48,
+                  }}
+                >
+                  <Storage />
+                </Avatar>
+                <Box>
+                  <Typography variant="h5" sx={{ 
+                    fontWeight: 700,
+                    background: 'linear-gradient(135deg, #00D4FF 0%, #6366F1 100%)',
+                    backgroundClip: 'text',
+                    WebkitBackgroundClip: 'text',
+                    color: 'transparent',
+                  }}>
+                    SS Milhas
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Sistema Técnico
+                  </Typography>
+                </Box>
+              </Stack>
+              
+              <Stack direction="row" justifyContent="center" spacing={1}>
+                <Chip
+                  icon={<NetworkCheck />}
+                  label="Online"
+                  size="small"
+                  color="success"
+                  variant="outlined"
+                />
+                <Chip
+                  icon={<Security />}
+                  label="Seguro"
+                  size="small"
+                  color="primary"
+                  variant="outlined"
+                />
+              </Stack>
             </Box>
 
-            {/* Formulário */}
             <CardContent sx={{ p: 3 }}>
-              <Typography
-                variant="h6"
-                sx={{
-                  fontWeight: 600,
-                  textAlign: 'center',
-                  mb: 2,
-                  color: 'text.primary',
-                }}
-              >
-                Faça login na sua conta
+              <Typography variant="h6" sx={{ 
+                mb: 3, 
+                textAlign: 'center',
+                color: '#E2E8F0',
+                fontWeight: 600
+              }}>
+                Acesso ao Sistema
               </Typography>
 
-
-            {error && (
-              <Alert severity="error" sx={{ mb: 3 }}>
-                {error}
-              </Alert>
-            )}
+              {error && (
+                <Alert severity="error" sx={{ mb: 3, bgcolor: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)' }}>
+                  {error}
+                </Alert>
+              )}
 
               <Box component="form" onSubmit={handleSubmit(onSubmit)}>
-                {/* Email */}
-              <TextField
-                fullWidth
-                label="Email"
-                type="email"
-                margin="dense"
-                autoComplete="email"
-                autoFocus
-                defaultValue="admin@ssmilhas.com"
-                {...register('email')}
-                error={!!errors.email}
-                helperText={errors.email?.message || 'Use: admin@ssmilhas.com'}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Email color="action" />
-                    </InputAdornment>
-                  ),
-                }}
-              />
+                <TextField
+                  fullWidth
+                  label="Email"
+                  type="email"
+                  margin="normal"
+                  variant="outlined"
+                  autoComplete="email"
+                  autoFocus
+                  error={!!errors.email}
+                  helperText={errors.email?.message}
+                  {...register('email')}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Email sx={{ color: 'text.secondary' }} />
+                      </InputAdornment>
+                    ),
+                  }}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: 2,
+                      '& fieldset': {
+                        borderColor: 'rgba(148, 163, 184, 0.2)',
+                      },
+                      '&:hover fieldset': {
+                        borderColor: 'rgba(0, 212, 255, 0.5)',
+                      },
+                      '&.Mui-focused fieldset': {
+                        borderColor: '#00D4FF',
+                      },
+                    },
+                    '& .MuiInputLabel-root': {
+                      color: 'text.secondary',
+                    },
+                    '& .MuiInputLabel-root.Mui-focused': {
+                      color: '#00D4FF',
+                    },
+                  }}
+                />
 
-                {/* Senha */}
                 <TextField
                   fullWidth
                   label="Senha"
                   type={showPassword ? 'text' : 'password'}
-                  margin="dense"
+                  margin="normal"
+                  variant="outlined"
                   autoComplete="current-password"
-                  defaultValue="123456"
-                  {...register('senha')}
                   error={!!errors.senha}
-                  helperText={errors.senha?.message || 'Use: 123456'}
+                  helperText={errors.senha?.message}
+                  {...register('senha')}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <Lock color="action" />
+                        <Lock sx={{ color: 'text.secondary' }} />
                       </InputAdornment>
                     ),
                     endAdornment: (
@@ -217,36 +271,63 @@ const Login = () => {
                       </InputAdornment>
                     ),
                   }}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: 2,
+                      '& fieldset': {
+                        borderColor: 'rgba(148, 163, 184, 0.2)',
+                      },
+                      '&:hover fieldset': {
+                        borderColor: 'rgba(0, 212, 255, 0.5)',
+                      },
+                      '&.Mui-focused fieldset': {
+                        borderColor: '#00D4FF',
+                      },
+                    },
+                    '& .MuiInputLabel-root': {
+                      color: 'text.secondary',
+                    },
+                    '& .MuiInputLabel-root.Mui-focused': {
+                      color: '#00D4FF',
+                    },
+                  }}
                 />
 
-                {/* Link para esqueci a senha */}
-                <Box sx={{ textAlign: 'right', mt: 1 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 3 }}>
                   <Link
                     component={RouterLink}
                     to="/forgot-password"
                     variant="body2"
-                    sx={{ textDecoration: 'none' }}
+                    sx={{
+                      color: '#00D4FF',
+                      textDecoration: 'none',
+                      '&:hover': {
+                        textDecoration: 'underline',
+                      },
+                    }}
                   >
-                    Esqueceu sua senha?
+                    Esqueceu a senha?
                   </Link>
                 </Box>
 
-                {/* Botão de login */}
                 <Button
                   type="submit"
                   fullWidth
                   variant="contained"
-                  size="large"
                   disabled={loading}
                   sx={{
-                    mt: 2,
-                    mb: 1,
-                    py: 1,
-                    fontSize: '1rem',
-                    fontWeight: 600,
-                    background: 'linear-gradient(45deg, #3B82F6, #10B981)',
+                    py: 1.5,
+                    mb: 2,
+                    borderRadius: 2,
+                    background: 'linear-gradient(135deg, #00D4FF 0%, #6366F1 100%)',
+                    boxShadow: '0 4px 14px 0 rgba(0, 212, 255, 0.3)',
                     '&:hover': {
-                      background: 'linear-gradient(45deg, #2563EB, #059669)',
+                      background: 'linear-gradient(135deg, #33DDFF 0%, #818CF8 100%)',
+                      boxShadow: '0 6px 20px 0 rgba(0, 212, 255, 0.4)',
+                    },
+                    '&:disabled': {
+                      background: 'rgba(148, 163, 184, 0.3)',
+                      color: 'rgba(148, 163, 184, 0.6)',
                     },
                   }}
                 >
@@ -257,26 +338,28 @@ const Login = () => {
                   )}
                 </Button>
 
-                <Divider sx={{ my: 2 }}>
+                <Divider sx={{ my: 2, borderColor: 'rgba(148, 163, 184, 0.1)' }}>
                   <Typography variant="body2" color="text.secondary">
                     ou
                   </Typography>
                 </Divider>
 
-                {/* Link para registro */}
                 <Box sx={{ textAlign: 'center' }}>
                   <Typography variant="body2" color="text.secondary">
                     Não tem uma conta?{' '}
                     <Link
                       component={RouterLink}
                       to="/register"
-                      variant="body2"
                       sx={{
-                        fontWeight: 600,
+                        color: '#00D4FF',
                         textDecoration: 'none',
+                        fontWeight: 500,
+                        '&:hover': {
+                          textDecoration: 'underline',
+                        },
                       }}
                     >
-                      Criar conta
+                      Cadastre-se
                     </Link>
                   </Typography>
                 </Box>

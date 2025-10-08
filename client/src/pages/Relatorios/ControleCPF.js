@@ -64,6 +64,7 @@ import {
   BarChart
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
+import { getAllCPFs, getCPFStats } from '../../data/cpfData';
 
 const ControleCPF = () => {
   const [cpfs, setCpfs] = useState([]);
@@ -76,46 +77,16 @@ const ControleCPF = () => {
   const [detailDialog, setDetailDialog] = useState(false);
   const [blockDialog, setBlockDialog] = useState(false);
 
-  // Dados mockados para demonstração
+  // Carregar dados da base centralizada
   useEffect(() => {
     const loadCPFData = async () => {
       setLoading(true);
       
       // Simular carregamento
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 500));
       
-      const cpfsMockados = [];
-      const nomes = [
-        'João Silva', 'Maria Santos', 'Pedro Oliveira', 'Ana Costa', 'Carlos Pereira',
-        'Lucia Ferreira', 'Roberto Almeida', 'Fernanda Lima', 'Marcos Souza', 'Juliana Rocha',
-        'Antonio Gomes', 'Patricia Dias', 'Ricardo Nunes', 'Camila Martins', 'Felipe Ribeiro'
-      ];
-      
-      const statusOptions = ['ativo', 'bloqueado', 'suspenso', 'verificando'];
-      
-      for (let i = 1; i <= 500; i++) {
-        const nomeIndex = Math.floor(Math.random() * nomes.length);
-        const status = statusOptions[Math.floor(Math.random() * statusOptions.length)];
-        const ultimoUso = new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000);
-        const totalMovimentacoes = Math.floor(Math.random() * 100) + 1;
-        const valorTotal = Math.floor(Math.random() * 50000) + 1000;
-        
-        cpfsMockados.push({
-          id: i,
-          nome: `${nomes[nomeIndex]} ${i}`,
-          cpf: `${Math.floor(Math.random() * 900000000) + 100000000}`,
-          status: status,
-          ultimoUso: ultimoUso,
-          totalMovimentacoes: totalMovimentacoes,
-          valorTotal: valorTotal,
-          programas: ['LATAM Pass', 'Smiles', 'TudoAzul'].slice(0, Math.floor(Math.random() * 3) + 1),
-          risco: Math.random() > 0.8 ? 'alto' : Math.random() > 0.5 ? 'médio' : 'baixo',
-          observacoes: status === 'bloqueado' ? 'CPF bloqueado por suspeita de fraude' : '',
-          dataCadastro: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000)
-        });
-      }
-      
-      setCpfs(cpfsMockados);
+      const cpfsData = getAllCPFs();
+      setCpfs(cpfsData);
       setLoading(false);
     };
 
@@ -192,7 +163,7 @@ const ControleCPF = () => {
 
   if (loading) {
     return (
-      <Box sx={{ p: 3 }}>
+      <Box>
         <LinearProgress />
         <Typography variant="h6" sx={{ mt: 2 }}>
           Carregando controle de CPFs...
@@ -202,7 +173,7 @@ const ControleCPF = () => {
   }
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 2 }}>
       {/* Header */}
       <Box sx={{ mb: 4 }}>
         <Typography variant="h4" sx={{ fontWeight: 700, color: 'primary.main', mb: 1 }}>
@@ -214,7 +185,7 @@ const ControleCPF = () => {
       </Box>
 
       {/* Estatísticas */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
+      <Grid container spacing={2} sx={{ mb: 4 }}>
         <Grid item xs={12} sm={6} md={3}>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -423,15 +394,16 @@ const ControleCPF = () => {
                     </TableCell>
                     <TableCell>
                       <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-                        {cpf.programas.map((programa, index) => (
+                        {cpf.programa ? (
                           <Chip
-                            key={index}
-                            label={programa}
+                            label={cpf.programa}
                             size="small"
                             color="primary"
                             variant="outlined"
                           />
-                        ))}
+                        ) : (
+                          <Typography variant="caption" color="text.secondary">-</Typography>
+                        )}
                       </Box>
                     </TableCell>
                     <TableCell align="right">
@@ -441,7 +413,7 @@ const ControleCPF = () => {
                     </TableCell>
                     <TableCell align="right">
                       <Typography variant="body2" sx={{ fontWeight: 600, color: 'primary.main' }}>
-                        R$ {cpf.valorTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                        R$ {(cpf.valorTotal || cpf.valor || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                       </Typography>
                     </TableCell>
                     <TableCell>
@@ -511,7 +483,7 @@ const ControleCPF = () => {
         </DialogTitle>
         <DialogContent>
           {selectedCpf && (
-            <Grid container spacing={3}>
+            <Grid container spacing={2}>
               <Grid item xs={12} md={6}>
                 <Typography variant="h6" sx={{ mb: 2 }}>Informações Pessoais</Typography>
                 <List>
@@ -560,7 +532,7 @@ const ControleCPF = () => {
                   <ListItem>
                     <ListItemText
                       primary="Valor Total Movimentado"
-                      secondary={`R$ ${selectedCpf.valorTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
+                      secondary={`R$ ${(selectedCpf.valorTotal || selectedCpf.valor || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
                     />
                   </ListItem>
                   <ListItem>
@@ -584,16 +556,17 @@ const ControleCPF = () => {
                 </List>
               </Grid>
               <Grid item xs={12}>
-                <Typography variant="h6" sx={{ mb: 2 }}>Programas Utilizados</Typography>
+                <Typography variant="h6" sx={{ mb: 2 }}>Programa</Typography>
                 <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                  {selectedCpf.programas.map((programa, index) => (
+                  {selectedCpf.programa ? (
                     <Chip
-                      key={index}
-                      label={programa}
+                      label={selectedCpf.programa}
                       color="primary"
                       variant="outlined"
                     />
-                  ))}
+                  ) : (
+                    <Typography variant="body2" color="text.secondary">Nenhum programa associado</Typography>
+                  )}
                 </Box>
               </Grid>
               {selectedCpf.observacoes && (

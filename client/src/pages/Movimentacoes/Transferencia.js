@@ -203,7 +203,7 @@ const Transferencia = () => {
     switch (step) {
       case 0:
         return (
-          <Grid container spacing={3}>
+          <Grid container spacing={2}>
             <Grid item xs={12} md={6}>
               <FormControl fullWidth>
                 <InputLabel>Pessoa de Origem</InputLabel>
@@ -249,7 +249,7 @@ const Transferencia = () => {
 
       case 1:
         return (
-          <Grid container spacing={3}>
+          <Grid container spacing={2}>
             <Grid item xs={12} md={6}>
               <FormControl fullWidth>
                 <InputLabel>Pessoa de Destino</InputLabel>
@@ -295,7 +295,7 @@ const Transferencia = () => {
 
       case 2:
         return (
-          <Grid container spacing={3}>
+          <Grid container spacing={2}>
             <Grid item xs={12} md={6}>
               <FormControl fullWidth>
                 <InputLabel>Tipo de Transferência</InputLabel>
@@ -354,7 +354,7 @@ const Transferencia = () => {
               Confira os dados da transferência antes de confirmar
             </Alert>
             
-            <Grid container spacing={3}>
+            <Grid container spacing={2}>
               <Grid item xs={12} md={6}>
                 <Card variant="outlined">
                   <CardContent>
@@ -404,7 +404,7 @@ const Transferencia = () => {
   };
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 2 }}>
       {/* Header */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
         <Box>
@@ -434,7 +434,7 @@ const Transferencia = () => {
       </Box>
 
       {/* Resumo */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
+      <Grid container spacing={2} sx={{ mb: 4 }}>
         <Grid item xs={12} md={3}>
           <Card>
             <CardContent>

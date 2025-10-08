@@ -222,7 +222,7 @@ const Transactions = () => {
 
   if (loading) {
     return (
-      <Box sx={{ p: 3 }}>
+      <Box>
         <LinearProgress />
         <Typography variant="h6" sx={{ mt: 2 }}>
           Carregando transações...
@@ -232,7 +232,7 @@ const Transactions = () => {
   }
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 2 }}>
       {/* Header */}
       <Box sx={{ mb: 4 }}>
         <Typography variant="h4" sx={{ fontWeight: 700, color: 'primary.main', mb: 1 }}>

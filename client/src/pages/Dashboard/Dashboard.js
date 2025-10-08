@@ -8,33 +8,21 @@ import {
   Button,
   Chip,
   IconButton,
-  Menu,
-  MenuItem,
-  ListItemIcon,
-  ListItemText,
-  Divider,
-  Paper,
   LinearProgress,
   Alert,
   Tooltip,
-  Badge,
-  TextField,
-  Select,
-  FormControl,
-  InputLabel,
   Avatar,
-  ToggleButton,
-  ToggleButtonGroup,
   Stack,
   CardActionArea,
-  CardActions
+  CardActions,
+  Divider,
+  Paper
 } from '@mui/material';
 import {
   TrendingUp,
   TrendingDown,
   AccountBalance,
   FlightTakeoff,
-  MoreVert,
   Refresh,
   Add,
   Download,
@@ -48,528 +36,465 @@ import {
   PersonAdd,
   Assessment,
   Timeline,
-  Search,
   Clear,
   Visibility,
   Edit,
   Delete,
   Star,
   StarBorder,
-  ShoppingCart,
-  TransferWithinAStation,
-  List,
-  CalendarMonth,
-  CalendarToday,
-  CalendarToday as CalendarViewYear,
-  TaskAlt,
-  Assignment
+  Assignment,
+  Speed,
+  Security,
+  Analytics,
+  Storage,
+  NetworkCheck,
+  CloudSync
 } from '@mui/icons-material';
-import { useAuth } from '../../contexts/AuthContext';
 import { motion } from 'framer-motion';
+import { useAuth } from '../../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
+
+// Componente de Card de Métrica
+const MetricCard = ({ title, value, change, icon, color = 'primary', onClick }) => {
+  const isPositive = change && change > 0;
+  
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      <Card
+        sx={{
+          background: 'linear-gradient(145deg, #1A1B2E 0%, #252741 100%)',
+          border: `1px solid ${color === 'primary' ? 'rgba(0, 212, 255, 0.2)' : color === 'success' ? 'rgba(16, 185, 129, 0.2)' : color === 'warning' ? 'rgba(245, 158, 11, 0.2)' : 'rgba(239, 68, 68, 0.2)'}`,
+          backdropFilter: 'blur(10px)',
+          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+          cursor: onClick ? 'pointer' : 'default',
+          '&:hover': onClick ? {
+            transform: 'translateY(-4px)',
+            borderColor: color === 'primary' ? 'rgba(0, 212, 255, 0.4)' : color === 'success' ? 'rgba(16, 185, 129, 0.4)' : color === 'warning' ? 'rgba(245, 158, 11, 0.4)' : 'rgba(239, 68, 68, 0.4)',
+            boxShadow: `0 20px 25px -5px ${color === 'primary' ? 'rgba(0, 212, 255, 0.1)' : color === 'success' ? 'rgba(16, 185, 129, 0.1)' : color === 'warning' ? 'rgba(245, 158, 11, 0.1)' : 'rgba(239, 68, 68, 0.1)'}, 0 10px 10px -5px ${color === 'primary' ? 'rgba(0, 212, 255, 0.04)' : color === 'success' ? 'rgba(16, 185, 129, 0.04)' : color === 'warning' ? 'rgba(245, 158, 11, 0.04)' : 'rgba(239, 68, 68, 0.04)'}`
+          } : {},
+        }}
+        onClick={onClick}
+      >
+        <CardContent sx={{ p: 3 }}>
+          <Stack direction="row" justifyContent="space-between" alignItems="flex-start" mb={2}>
+            <Box>
+              <Typography variant="body2" color="text.secondary" gutterBottom>
+                {title}
+              </Typography>
+              <Typography variant="h4" component="div" sx={{ fontWeight: 600, mb: 1 }}>
+                {value}
+              </Typography>
+              {change !== undefined && (
+                <Stack direction="row" alignItems="center" spacing={0.5}>
+                  {isPositive ? (
+                    <TrendingUp sx={{ fontSize: 16, color: 'success.main' }} />
+                  ) : (
+                    <TrendingDown sx={{ fontSize: 16, color: 'error.main' }} />
+                  )}
+                  <Typography
+                    variant="body2"
+                    color={isPositive ? 'success.main' : 'error.main'}
+                    sx={{ fontWeight: 500 }}
+                  >
+                    {Math.abs(change)}%
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    vs mês anterior
+                  </Typography>
+                </Stack>
+              )}
+            </Box>
+            <Avatar
+              sx={{
+                bgcolor: color === 'primary' ? 'primary.main' : color === 'success' ? 'success.main' : color === 'warning' ? 'warning.main' : 'error.main',
+                width: 48,
+                height: 48,
+              }}
+            >
+              {icon}
+            </Avatar>
+          </Stack>
+        </CardContent>
+      </Card>
+    </motion.div>
+  );
+};
+
+// Componente de Card de Ação Rápida
+const QuickActionCard = ({ title, description, icon, color, onClick }) => (
+  <motion.div
+    initial={{ opacity: 0, scale: 0.9 }}
+    animate={{ opacity: 1, scale: 1 }}
+    transition={{ duration: 0.3 }}
+    whileHover={{ scale: 1.02 }}
+    whileTap={{ scale: 0.98 }}
+  >
+    <Card
+      sx={{
+        background: 'linear-gradient(145deg, #1A1B2E 0%, #252741 100%)',
+        border: `1px solid ${color}`,
+        backdropFilter: 'blur(10px)',
+        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        cursor: 'pointer',
+        height: '100%',
+        '&:hover': {
+          transform: 'translateY(-4px)',
+          borderColor: color.replace('0.2', '0.4'),
+          boxShadow: `0 20px 25px -5px ${color.replace('0.2', '0.1')}, 0 10px 10px -5px ${color.replace('0.2', '0.04')}`
+        },
+      }}
+      onClick={onClick}
+    >
+      <CardActionArea sx={{ height: '100%' }}>
+        <CardContent sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+          <Box>
+            <Avatar
+              sx={{
+                bgcolor: color.replace('rgba(', '').replace(', 0.2)', ''),
+                width: 40,
+                height: 40,
+                mb: 2,
+              }}
+            >
+              {icon}
+            </Avatar>
+            <Typography variant="h6" component="div" gutterBottom sx={{ fontWeight: 600 }}>
+              {title}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {description}
+            </Typography>
+          </Box>
+          <Button
+            size="small"
+            endIcon={<Add />}
+            sx={{ mt: 2, alignSelf: 'flex-start' }}
+          >
+            Acessar
+          </Button>
+        </CardContent>
+      </CardActionArea>
+    </Card>
+  </motion.div>
+);
+
+// Componente de Atividade Recente
+const RecentActivity = ({ activities = [] }) => (
+  <Card
+    sx={{
+      background: 'linear-gradient(145deg, #1A1B2E 0%, #252741 100%)',
+      border: '1px solid rgba(99, 102, 241, 0.2)',
+      backdropFilter: 'blur(10px)',
+    }}
+  >
+    <CardContent>
+      <Stack direction="row" justifyContent="space-between" alignItems="center" mb={3}>
+        <Typography variant="h6" sx={{ fontWeight: 600 }}>
+          Atividade Recente
+        </Typography>
+        <IconButton size="small">
+          <Refresh />
+        </IconButton>
+      </Stack>
+      
+      <Stack spacing={2}>
+        {activities.map((activity, index) => (
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: index * 0.1 }}
+          >
+            <Stack direction="row" alignItems="center" spacing={2}>
+              <Avatar
+                sx={{
+                  bgcolor: activity.type === 'success' ? 'success.main' : activity.type === 'warning' ? 'warning.main' : 'primary.main',
+                  width: 32,
+                  height: 32,
+                }}
+              >
+                {activity.icon}
+              </Avatar>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                  {activity.title}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  {activity.time}
+                </Typography>
+              </Box>
+              <Chip
+                label={activity.status}
+                size="small"
+                color={activity.type === 'success' ? 'success' : activity.type === 'warning' ? 'warning' : 'primary'}
+                variant="outlined"
+              />
+            </Stack>
+            {index < activities.length - 1 && <Divider sx={{ mt: 2 }} />}
+          </motion.div>
+        ))}
+      </Stack>
+    </CardContent>
+  </Card>
+);
+
+// Componente de Status do Sistema
+const SystemStatus = () => {
+  const [systems] = useState([
+    { name: 'Banco de Dados', status: 'online', progress: 95 },
+    { name: 'API Backend', status: 'online', progress: 98 },
+    { name: 'Sistema de IA', status: 'online', progress: 87 },
+    { name: 'Monitoramento', status: 'online', progress: 92 },
+  ]);
+
+  return (
+    <Card
+      sx={{
+        background: 'linear-gradient(145deg, #1A1B2E 0%, #252741 100%)',
+        border: '1px solid rgba(16, 185, 129, 0.2)',
+        backdropFilter: 'blur(10px)',
+      }}
+    >
+      <CardContent>
+        <Stack direction="row" alignItems="center" spacing={1} mb={3}>
+          <NetworkCheck sx={{ color: 'success.main' }} />
+          <Typography variant="h6" sx={{ fontWeight: 600 }}>
+            Status do Sistema
+          </Typography>
+        </Stack>
+        
+        <Stack spacing={2}>
+          {systems.map((system, index) => (
+            <Box key={index}>
+              <Stack direction="row" justifyContent="space-between" alignItems="center" mb={1}>
+                <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                  {system.name}
+                </Typography>
+                <Chip
+                  label={system.status}
+                  size="small"
+                  color="success"
+                  variant="outlined"
+                />
+              </Stack>
+              <LinearProgress
+                variant="determinate"
+                value={system.progress}
+                sx={{
+                  height: 6,
+                  borderRadius: 3,
+                  bgcolor: 'rgba(16, 185, 129, 0.1)',
+                  '& .MuiLinearProgress-bar': {
+                    bgcolor: 'success.main',
+                  },
+                }}
+              />
+            </Box>
+          ))}
+        </Stack>
+      </CardContent>
+    </Card>
+  );
+};
 
 const Dashboard = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [filterMenu, setFilterMenu] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedProgram, setSelectedProgram] = useState('todos');
-  const [selectedPerson, setSelectedPerson] = useState('todos');
-  const [selectedTag, setSelectedTag] = useState('todos');
-  const [sortBy, setSortBy] = useState('programa');
-  const [resumoType, setResumoType] = useState('mensal'); // mensal, anual, total
-
-  // Dados mockados baseados na imagem do iddas.com.br
-  const [dashboardData, setDashboardData] = useState({
-    resumo: {
-      compras: 35401.46,
-      vendas: 15612.87,
-      recebimentos: 18943.00
-    },
-    tarefas: {
-      total: 2,
-      atrasadas: 0,
-      proximosDias: 0,
-      longoPrazo: 2
-    },
-    contas: [],
-    etiquetas: ['VIP', 'Premium', 'Básico', 'Novo', 'Inativo']
+  const [metrics, setMetrics] = useState({
+    totalMilhas: '2.5M',
+    valorTotal: 'R$ 485.2K',
+    transacoes: '1,247',
+    clientes: '342'
   });
 
-  // Lista completa de programas de fidelidade (como no iddas)
-  const programasFidelidade = [
-    'Todos', 'LATAM Pass', 'Smiles', 'TudoAzul', 'Livelo', 'LifeMiles',
-    'Emirates Skywards', 'Delta SkyMiles', 'Flying Blue', 'British Executive Club',
-    'Qatar Privilege Club', 'United Airlines', 'American Airlines', 'Air France',
-    'KLM', 'Lufthansa', 'Swiss', 'Turkish Airlines', 'Aerolíneas Argentinas',
-    'Aeroplan', 'Air Europa', 'Alaska Airlines', 'Iberia', 'TAP Miles&Go',
-    'Virgin Red', 'World of Hyatt', 'Hilton Honors', 'Marriott Bonvoy',
-    'IHG', 'Accor', 'Meliá', 'Itaú', 'Banco do Brasil', 'Bradesco', 'Caixa',
-    'Santander', 'BTG Pactual', 'XP Investimentos', 'Nubank', 'Inter',
-    'Safra', 'Sicredi', 'Unicred', 'Cresol', 'Coopera', 'Ailos',
-    'Banrisul', 'BRB', 'Credicard', 'Banescard', 'BV Merece', 'Genial',
-    'Nomad Pass', 'Porto Plus', 'Premmia', 'Qantas', 'Southwest',
-    'Shell Box', 'Sisprime', 'Connect Miles', 'Curtaí', 'Dotz', 'Esfera',
-    'Etihad Guest', 'Finnair Plus', 'GPA', 'IB', 'Membership Rewards',
-    'Miles&Smiles Turkish', 'Volare - ITA Airways'
+  // Simulação de atividades recentes
+  const recentActivities = [
+    {
+      title: 'Nova transação processada',
+      time: '2 min atrás',
+      status: 'Concluído',
+      type: 'success',
+      icon: <CheckCircle />
+    },
+    {
+      title: 'Sistema de IA analisou oportunidades',
+      time: '5 min atrás',
+      status: 'Processado',
+      type: 'success',
+      icon: <Analytics />
+    },
+    {
+      title: 'Backup automático realizado',
+      time: '1 hora atrás',
+      status: 'Concluído',
+      type: 'success',
+      icon: <CloudSync />
+    },
+    {
+      title: 'Monitoramento de canal ativo',
+      time: '2 horas atrás',
+      status: 'Online',
+      type: 'warning',
+      icon: <Security />
+    }
   ];
 
   useEffect(() => {
-    const loadDashboardData = async () => {
-      try {
-        setLoading(true);
-        // Simular carregamento de dados
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // Dados baseados na imagem do iddas.com.br
-        const contasMockadas = [
-          { id: 1, nome: 'ADRIANA', programa: 'Livelo', milhas: 29008, cm: 23.33, valor: 676.66, favorito: false },
-          { id: 2, nome: 'ADRIANA DE PAULA', programa: 'Livelo', milhas: 974, cm: 29.09, valor: 28.33, favorito: false },
-          { id: 3, nome: 'AIRAM', programa: 'Livelo', milhas: 590, cm: 23.53, valor: 13.88, favorito: false },
-          { id: 4, nome: 'ALEX', programa: 'Livelo', milhas: 15000, cm: 25.50, valor: 382.50, favorito: true },
-          { id: 5, nome: 'ANDRE', programa: 'Livelo', milhas: 8500, cm: 24.20, valor: 205.70, favorito: false },
-          { id: 6, nome: 'BRUNA', programa: 'Livelo', milhas: 12000, cm: 26.80, valor: 321.60, favorito: false },
-          { id: 7, nome: 'CAIO', programa: 'Livelo', milhas: 22000, cm: 22.45, valor: 493.90, favorito: true },
-          { id: 8, nome: 'CARLOS', programa: 'Livelo', milhas: 18000, cm: 24.90, valor: 448.20, favorito: false },
-          { id: 9, nome: 'CELIA', programa: 'Livelo', milhas: 7500, cm: 27.30, valor: 204.75, favorito: false },
-          { id: 10, nome: 'FELIPE', programa: 'Livelo', milhas: 13500, cm: 25.80, valor: 348.30, favorito: false },
-          { id: 11, nome: 'JENNIFER', programa: 'Livelo', milhas: 9500, cm: 26.50, valor: 251.75, favorito: false },
-          { id: 12, nome: 'JULIANA', programa: 'Livelo', milhas: 16000, cm: 23.90, valor: 382.40, favorito: false },
-          { id: 13, nome: 'LAUREN', programa: 'Livelo', milhas: 11000, cm: 25.20, valor: 277.20, favorito: false },
-          { id: 14, nome: 'MARCELO', programa: 'Livelo', milhas: 20000, cm: 24.60, valor: 492.00, favorito: false },
-          { id: 15, nome: 'MARCIO ALACE', programa: 'Livelo', milhas: 14000, cm: 26.10, valor: 365.40, favorito: false },
-          { id: 16, nome: 'PABLO', programa: 'Livelo', milhas: 17000, cm: 25.40, valor: 431.80, favorito: false },
-          { id: 17, nome: 'PEDRO DIAS', programa: 'Livelo', milhas: 12500, cm: 24.80, valor: 310.00, favorito: false },
-          { id: 18, nome: 'PEDRO PAULO', programa: 'Livelo', milhas: 19000, cm: 23.70, valor: 450.30, favorito: true },
-          { id: 19, nome: 'PEDRO SOARES', programa: 'Livelo', milhas: 13000, cm: 26.20, valor: 340.60, favorito: false },
-          { id: 20, nome: 'PRISCILA', programa: 'Livelo', milhas: 10500, cm: 25.60, valor: 268.80, favorito: false }
-        ];
+    // Simular carregamento
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1000);
 
-        // Gerar contas adicionais para atingir 500+
-        const nomesAdicionais = [
-          'João Silva', 'Maria Santos', 'Pedro Oliveira', 'Ana Costa', 'Carlos Pereira',
-          'Lucia Ferreira', 'Roberto Almeida', 'Fernanda Lima', 'Marcos Souza', 'Juliana Rocha',
-          'Antonio Gomes', 'Patricia Dias', 'Ricardo Nunes', 'Camila Martins', 'Felipe Ribeiro'
-        ];
-        
-        const programas = ['Livelo', 'LATAM Pass', 'Smiles', 'TudoAzul', 'LifeMiles'];
-
-        for (let i = 21; i <= 500; i++) {
-          const nomeIndex = Math.floor(Math.random() * nomesAdicionais.length);
-          const programaIndex = Math.floor(Math.random() * programas.length);
-          const milhas = Math.floor(Math.random() * 50000) + 1000;
-          const cm = Math.random() * 10 + 20; // R$ 20-30 por milha
-          const valor = (milhas * cm) / 1000;
-          
-          contasMockadas.push({
-            id: i,
-            nome: `${nomesAdicionais[nomeIndex]} ${i}`,
-            programa: programas[programaIndex],
-            milhas: milhas,
-            cm: cm,
-            valor: valor,
-            favorito: Math.random() > 0.8
-          });
-        }
-
-        setDashboardData({
-          resumo: {
-            compras: 35401.46,
-            vendas: 15612.87,
-            recebimentos: 18943.00
-          },
-          tarefas: {
-            total: 2,
-            atrasadas: 0,
-            proximosDias: 0,
-            longoPrazo: 2
-          },
-          contas: contasMockadas,
-          etiquetas: ['VIP', 'Premium', 'Básico', 'Novo', 'Inativo']
-        });
-      } catch (error) {
-        console.error('Erro ao carregar dados do dashboard:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadDashboardData();
+    return () => clearTimeout(timer);
   }, []);
-
-  // Filtrar contas baseado nos filtros
-  const contasFiltradas = dashboardData.contas.filter(conta => {
-    const matchesSearch = conta.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         conta.programa.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesProgram = selectedProgram === 'todos' || conta.programa === selectedProgram;
-    const matchesPerson = selectedPerson === 'todos' || conta.nome.includes(selectedPerson);
-    const matchesTag = selectedTag === 'todos' || (conta.favorito && selectedTag === 'VIP');
-    
-    return matchesSearch && matchesProgram && matchesPerson && matchesTag;
-  });
-
-  // Ordenar contas
-  const contasOrdenadas = [...contasFiltradas].sort((a, b) => {
-    switch (sortBy) {
-      case 'nome':
-        return a.nome.localeCompare(b.nome);
-      case 'programa':
-        return a.programa.localeCompare(b.programa);
-      case 'milhas_crescente':
-        return a.milhas - b.milhas;
-      case 'milhas_decrescente':
-        return b.milhas - a.milhas;
-      case 'valor_crescente':
-        return a.valor - b.valor;
-      case 'valor_decrescente':
-        return b.valor - a.valor;
-      default:
-        return 0;
-    }
-  });
-
-  const handleMenuOpen = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
-
-  const handleFilterOpen = (event) => {
-    setFilterMenu(event.currentTarget);
-  };
-
-  const handleFilterClose = () => {
-    setFilterMenu(null);
-  };
 
   if (loading) {
     return (
-      <Box sx={{ p: 3 }}>
-        <LinearProgress />
-        <Typography variant="h6" sx={{ mt: 2 }}>
-          Carregando dashboard...
-        </Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <LinearProgress sx={{ width: '50%' }} />
       </Box>
     );
   }
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 2, background: 'linear-gradient(135deg, #0A0B1E 0%, #1A1B2E 100%)', minHeight: '100vh' }}>
       {/* Header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
-        <Box>
-          <Typography variant="h4" sx={{ fontWeight: 700, color: 'primary.main' }}>
-            Dashboard SS Milhas
-          </Typography>
-          <Typography variant="subtitle1" color="text.secondary">
-            Bem-vindo de volta, {user?.nome || 'Usuário'}! • {dashboardData.contas.length} contas cadastradas
-          </Typography>
-        </Box>
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          <Tooltip title="Atualizar">
-            <IconButton onClick={() => window.location.reload()}>
-              <Refresh />
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <Stack direction="row" justifyContent="space-between" alignItems="center" mb={4}>
+          <Box>
+            <Typography variant="h4" sx={{ fontWeight: 700, mb: 1, background: 'linear-gradient(135deg, #00D4FF 0%, #6366F1 100%)', backgroundClip: 'text', WebkitBackgroundClip: 'text', color: 'transparent' }}>
+              Dashboard SS Milhas
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
+              Bem-vindo de volta, {user?.name || 'Usuário'}
+            </Typography>
+          </Box>
+          <Stack direction="row" spacing={2}>
+            <IconButton sx={{ color: 'text.secondary' }}>
+              <Notifications />
             </IconButton>
-          </Tooltip>
-        </Box>
-      </Box>
+            <IconButton sx={{ color: 'text.secondary' }}>
+              <FilterList />
+            </IconButton>
+            <IconButton sx={{ color: 'text.secondary' }}>
+              <Download />
+            </IconButton>
+          </Stack>
+        </Stack>
+      </motion.div>
 
-      {/* Filtros e Pesquisa */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Grid container spacing={2} alignItems="center">
-            <Grid item xs={12} md={2}>
-              <FormControl fullWidth size="small">
-                <InputLabel>Pessoa</InputLabel>
-                <Select
-                  value={selectedPerson}
-                  label="Pessoa"
-                  onChange={(e) => setSelectedPerson(e.target.value)}
-                >
-                  <MenuItem value="todos">Todos</MenuItem>
-                  {Array.from(new Set(dashboardData.contas.map(c => c.nome.split(' ')[0])))
-                    .sort().map(nome => (
-                    <MenuItem key={nome} value={nome}>{nome}</MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} md={2}>
-              <FormControl fullWidth size="small">
-                <InputLabel>Programa</InputLabel>
-                <Select
-                  value={selectedProgram}
-                  label="Programa"
-                  onChange={(e) => setSelectedProgram(e.target.value)}
-                >
-                  {programasFidelidade.map(programa => (
-                    <MenuItem key={programa} value={programa === 'Todos' ? 'todos' : programa}>
-                      {programa}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} md={2}>
-              <FormControl fullWidth size="small">
-                <InputLabel>Ordenação</InputLabel>
-                <Select
-                  value={sortBy}
-                  label="Ordenação"
-                  onChange={(e) => setSortBy(e.target.value)}
-                >
-                  <MenuItem value="programa">Programa</MenuItem>
-                  <MenuItem value="nome">Nome</MenuItem>
-                  <MenuItem value="milhas_crescente">Milhas Crescente</MenuItem>
-                  <MenuItem value="milhas_decrescente">Milhas Decrescente</MenuItem>
-                  <MenuItem value="valor_crescente">Valor Crescente</MenuItem>
-                  <MenuItem value="valor_decrescente">Valor Decrescente</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} md={2}>
-              <FormControl fullWidth size="small">
-                <InputLabel>Etiqueta</InputLabel>
-                <Select
-                  value={selectedTag}
-                  label="Etiqueta"
-                  onChange={(e) => setSelectedTag(e.target.value)}
-                >
-                  <MenuItem value="todos">Todos</MenuItem>
-                  {dashboardData.etiquetas.map(etiqueta => (
-                    <MenuItem key={etiqueta} value={etiqueta}>{etiqueta}</MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} md={2}>
-              <Button 
-                variant="contained" 
-                fullWidth
-                startIcon={<Search />}
-                size="small"
-              >
-                Pesquisar
-              </Button>
-            </Grid>
-          </Grid>
-        </CardContent>
-      </Card>
-
-      {/* Botões de Resumo */}
-      <Box sx={{ mb: 3 }}>
-        <ToggleButtonGroup
-          value={resumoType}
-          exclusive
-          onChange={(e, newValue) => newValue && setResumoType(newValue)}
-          size="small"
-        >
-          <ToggleButton value="mensal">
-            <CalendarToday sx={{ mr: 1 }} />
-            Resumo Mensal
-          </ToggleButton>
-          <ToggleButton value="anual">
-            <CalendarMonth sx={{ mr: 1 }} />
-            Resumo Anual
-          </ToggleButton>
-          <ToggleButton value="total">
-            <CalendarViewYear sx={{ mr: 1 }} />
-            Resumo Total
-          </ToggleButton>
-        </ToggleButtonGroup>
-      </Box>
-
-      {/* Cards de Resumo Financeiro */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} md={4}>
-          <Card sx={{ bgcolor: 'primary.light', color: 'white' }}>
-            <CardContent>
-              <Typography variant="h6" sx={{ mb: 1 }}>
-                Compras
-              </Typography>
-              <Typography variant="h4" sx={{ fontWeight: 700 }}>
-                R$ {dashboardData.resumo.compras.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-              </Typography>
-            </CardContent>
-          </Card>
+      {/* Métricas Principais */}
+      <Grid container spacing={2} mb={4}>
+        <Grid item xs={12} sm={6} md={3}>
+          <MetricCard
+            title="Total de Milhas"
+            value={metrics.totalMilhas}
+            change={12.5}
+            icon={<FlightTakeoff />}
+            color="primary"
+          />
         </Grid>
-        <Grid item xs={12} md={4}>
-          <Card sx={{ bgcolor: 'success.light', color: 'white' }}>
-            <CardContent>
-              <Typography variant="h6" sx={{ mb: 1 }}>
-                Vendas
-              </Typography>
-              <Typography variant="h4" sx={{ fontWeight: 700 }}>
-                R$ {dashboardData.resumo.vendas.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-              </Typography>
-            </CardContent>
-          </Card>
+        <Grid item xs={12} sm={6} md={3}>
+          <MetricCard
+            title="Valor Total"
+            value={metrics.valorTotal}
+            change={8.3}
+            icon={<AccountBalance />}
+            color="success"
+          />
         </Grid>
-        <Grid item xs={12} md={4}>
-          <Card sx={{ bgcolor: 'info.light', color: 'white' }}>
-            <CardContent>
-              <Typography variant="h6" sx={{ mb: 1 }}>
-                Recebimentos
-              </Typography>
-              <Typography variant="h4" sx={{ fontWeight: 700 }}>
-                R$ {dashboardData.resumo.recebimentos.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-              </Typography>
-            </CardContent>
-          </Card>
+        <Grid item xs={12} sm={6} md={3}>
+          <MetricCard
+            title="Transações"
+            value={metrics.transacoes}
+            change={-2.1}
+            icon={<SwapHoriz />}
+            color="warning"
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <MetricCard
+            title="Clientes Ativos"
+            value={metrics.clientes}
+            change={15.7}
+            icon={<PersonAdd />}
+            color="primary"
+          />
         </Grid>
       </Grid>
 
-      {/* Banner de Tarefas */}
-      <Alert 
-        severity="info" 
-        sx={{ mb: 3 }}
-        action={
-          <Button color="inherit" size="small" startIcon={<TaskAlt />}>
-            Ver Tarefas
-          </Button>
-        }
+      {/* Ações Rápidas */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
       >
-        <Typography variant="body2">
-          Você possui <strong>{dashboardData.tarefas.total} tarefas</strong> • 
-          {dashboardData.tarefas.atrasadas} atrasada(s) • 
-          {dashboardData.tarefas.proximosDias} nos próximos dias • 
-          {dashboardData.tarefas.longoPrazo} longo prazo
+        <Typography variant="h5" sx={{ fontWeight: 600, mb: 3 }}>
+          Ações Rápidas
         </Typography>
-      </Alert>
-
-      {/* Grid de Contas - Cards Individuais */}
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h6" sx={{ mb: 2 }}>
-          Contas Cadastradas ({contasFiltradas.length} de {dashboardData.contas.length})
-        </Typography>
-        
-        <Grid container spacing={2}>
-          {contasOrdenadas.slice(0, 24).map((conta) => (
-            <Grid item xs={12} sm={6} md={4} lg={3} key={conta.id}>
-              <Card 
-                sx={{ 
-                  height: '100%',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  '&:hover': {
-                    boxShadow: 4,
-                    transform: 'translateY(-2px)',
-                    transition: 'all 0.2s ease-in-out'
-                  }
-                }}
-              >
-                <CardActionArea sx={{ flexGrow: 1 }}>
-                  <CardContent sx={{ pb: 1 }}>
-                    {/* Header do Card */}
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                      <Typography 
-                        variant="h6" 
-                        sx={{ 
-                          fontWeight: 600,
-                          fontSize: '1rem',
-                          color: conta.favorito ? 'warning.main' : 'text.primary'
-                        }}
-                      >
-                        {conta.nome} {conta.favorito && '★'}
-                      </Typography>
-                      <Avatar 
-                        sx={{ 
-                          width: 40, 
-                          height: 40, 
-                          bgcolor: 'primary.main',
-                          fontSize: '0.875rem'
-                        }}
-                      >
-                        {conta.programa.charAt(0)}
-                      </Avatar>
-                    </Box>
-
-                    {/* Programa */}
-                    <Box sx={{ mb: 2 }}>
-                      <Chip 
-                        label={conta.programa}
-                        size="small"
-                        color="primary"
-                        variant="outlined"
-                        sx={{ fontSize: '0.75rem' }}
-                      />
-                    </Box>
-
-                    {/* Informações Financeiras */}
-                    <Box sx={{ mb: 2 }}>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                        <Typography variant="body2" color="text.secondary">
-                          Milhas:
-                        </Typography>
-                        <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                          {conta.milhas.toLocaleString()}
-                        </Typography>
-                      </Box>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                        <Typography variant="body2" color="text.secondary">
-                          CM:
-                        </Typography>
-                        <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                          R$ {conta.cm.toFixed(2)}
-                        </Typography>
-                      </Box>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <Typography variant="body2" color="text.secondary">
-                          R$:
-                        </Typography>
-                        <Typography variant="body2" sx={{ fontWeight: 600, color: 'primary.main' }}>
-                          R$ {conta.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                        </Typography>
-                      </Box>
-                    </Box>
-                  </CardContent>
-                </CardActionArea>
-
-                {/* Ações */}
-                <CardActions sx={{ p: 2, pt: 0 }}>
-                  <Button 
-                    size="small" 
-                    startIcon={<ShoppingCart />}
-                    variant="outlined"
-                    color="success"
-                    sx={{ flexGrow: 1, fontSize: '0.75rem' }}
-                  >
-                    + Comprar
-                  </Button>
-                  <Button 
-                    size="small" 
-                    startIcon={<TransferWithinAStation />}
-                    variant="outlined"
-                    color="warning"
-                    sx={{ flexGrow: 1, fontSize: '0.75rem' }}
-                  >
-                    - Transferir
-                  </Button>
-                  <IconButton size="small">
-                    <List />
-                  </IconButton>
-                </CardActions>
-              </Card>
-            </Grid>
-          ))}
+        <Grid container spacing={2} mb={4}>
+          <Grid item xs={12} sm={6} md={3}>
+            <QuickActionCard
+              title="Nova Transação"
+              description="Registrar nova movimentação de milhas"
+              icon={<Add />}
+              color="rgba(0, 212, 255, 0.2)"
+            />
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <QuickActionCard
+              title="Relatórios"
+              description="Visualizar análises e relatórios"
+              icon={<Assessment />}
+              color="rgba(16, 185, 129, 0.2)"
+            />
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <QuickActionCard
+              title="Controle de Programas"
+              description="Gerenciar programas de milhas"
+              icon={<FlightTakeoff />}
+              color="rgba(99, 102, 241, 0.2)"
+              onClick={() => navigate('/dashboard/controle-programas')}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <QuickActionCard
+              title="IA Dashboard"
+              description="Monitoramento inteligente"
+              icon={<Analytics />}
+              color="rgba(99, 102, 241, 0.2)"
+            />
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <QuickActionCard
+              title="Configurações"
+              description="Gerenciar sistema e usuários"
+              icon={<Security />}
+              color="rgba(245, 158, 11, 0.2)"
+            />
+          </Grid>
         </Grid>
+      </motion.div>
 
-        {/* Botão para carregar mais */}
-        {contasOrdenadas.length > 24 && (
-          <Box sx={{ textAlign: 'center', mt: 3 }}>
-            <Button 
-              variant="outlined" 
-              size="large"
-              startIcon={<Add />}
-            >
-              Carregar Mais Contas ({contasOrdenadas.length - 24} restantes)
-            </Button>
-          </Box>
-        )}
-      </Box>
-
+      {/* Conteúdo Inferior */}
+      <Grid container spacing={2}>
+        <Grid item xs={12} md={8}>
+          <RecentActivity activities={recentActivities} />
+        </Grid>
+        <Grid item xs={12} md={4}>
+          <SystemStatus />
+        </Grid>
+      </Grid>
     </Box>
   );
 };

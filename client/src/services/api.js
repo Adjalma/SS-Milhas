@@ -323,6 +323,28 @@ export const notificationsAPI = {
   unsubscribe: (data) => api.delete('/notifications/unsubscribe', { data }),
 };
 
+// ==================== PROGRAMAS ====================
+
+export const programsAPI = {
+  // Listar programas
+  getPrograms: (params) => api.get('/programs', { params }),
+  
+  // Obter programa específico
+  getProgram: (id) => api.get(`/programs/${id}`),
+  
+  // Criar programa
+  createProgram: (data) => api.post('/programs', data),
+  
+  // Atualizar programa
+  updateProgram: (id, data) => api.put(`/programs/${id}`, data),
+  
+  // Deletar programa
+  deleteProgram: (id) => api.delete(`/programs/${id}`),
+  
+  // Estatísticas
+  getStats: () => api.get('/programs/stats'),
+};
+
 // ==================== UTILITÁRIOS ====================
 
 export const utilsAPI = {
