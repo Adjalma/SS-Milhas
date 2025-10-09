@@ -4,10 +4,10 @@
   "description": "Sistema de Gestão de Milhas",
   "main": "server/index.js",
   "scripts": {
-    "start": "cd server && npm start",
-    "build": "cd client && npm run build",
-    "install-client": "cd client && npm install",
-    "install-server": "cd server && npm install",
+    "start": "node server/index.js",
+    "build": "npm run build --prefix client",
+    "install-client": "npm install --prefix client",
+    "install-server": "npm install --prefix server",
     "install-all": "npm run install-client && npm run install-server"
   },
   "engines": {
