@@ -5,7 +5,7 @@
   "main": "server/index.js",
   "scripts": {
     "prestart": "npm install --prefix server",
-    "start": "node start.js",
+    "start": "node -r dotenv/config start.js",
     "build": "npm run build --prefix client",
     "install-client": "npm install --prefix client",
     "install-server": "npm install --prefix server",
@@ -13,5 +13,8 @@
   },
   "engines": {
     "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "dotenv": "^16.3.1"
   }
 }
