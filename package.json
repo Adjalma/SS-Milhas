@@ -5,7 +5,6 @@
   "main": "server/index.js",
   "scripts": {
     "start": "node start.js",
-    "build": "npm run build --prefix client",
     "install-client": "npm install --prefix client",
     "install-server": "npm install --prefix server",
     "install-all": "npm run install-client && npm run install-server"
