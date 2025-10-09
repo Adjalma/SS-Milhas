@@ -60,7 +60,7 @@ app.use(helmet({
 // CORS configurado para permitir apenas origens específicas
 const corsOptions = {
   origin: process.env.NODE_ENV === 'production' 
-    ? ['https://seudominio.com'] 
+    ? ['https://ss-milhas.vercel.app', 'https://ss-milhas.com.br'] 
     : ['http://localhost:3000'],
   credentials: true,
   optionsSuccessStatus: 200
