@@ -4,7 +4,8 @@
   "description": "Sistema de Gestão de Milhas",
   "main": "server/index.js",
   "scripts": {
-    "start": "node server/index.js",
+    "prestart": "npm install --prefix server",
+    "start": "node start.js",
     "build": "npm run build --prefix client",
     "install-client": "npm install --prefix client",
     "install-server": "npm install --prefix server",
