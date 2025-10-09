@@ -1,6 +1,3 @@
 // Arquivo de inicialização para Railway
-// Carrega as variáveis de ambiente
-require('dotenv').config();
-
-// Inicia o servidor
+// As variáveis de ambiente são carregadas automaticamente pelo Railway
 require('./server/index.js');
