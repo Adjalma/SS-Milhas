@@ -228,29 +228,12 @@ app.post('/api/create-admin', async (req, res) => {
       });
     }
 
-    // Criar Account
-    const Account = mongoose.models.Account || mongoose.model('Account', new mongoose.Schema({
-      nome: { type: String, required: true },
-      email: { type: String, required: true },
-      ativo: { type: Boolean, default: true }
-    }, { timestamps: true }));
-
-    let account = await Account.findOne({ email: 'admin@ssmilhas.com' });
-    if (!account) {
-      account = new Account({
-        nome: 'Conta Principal',
-        email: 'admin@ssmilhas.com'
-      });
-      await account.save();
-    }
-
-    // Criar usuário admin
+    // Criar usuário admin primeiro (sem accountId)
     const adminUser = new User({
       nome: 'Administrador',
       email: 'admin@ssmilhas.com',
       senha: 'admin123',
       role: 'admin',
-      accountId: account._id,
       status: 'ativo',
       permissions: {
         financeiro: true,
@@ -261,6 +244,27 @@ app.post('/api/create-admin', async (req, res) => {
       }
     });
 
+    await adminUser.save();
+
+    // Agora criar Account com o admin como owner
+    const Account = require('./models/Account');
+    
+    let account = await Account.findOne({ owner: adminUser._id });
+    if (!account) {
+      account = new Account({
+        nome: 'Conta Principal',
+        owner: adminUser._id,
+        usuarios: [{
+          usuario: adminUser._id,
+          role: 'owner',
+          adicionadoEm: new Date()
+        }]
+      });
+      await account.save();
+    }
+
+    // Atualizar o usuário com o accountId
+    adminUser.accountId = account._id;
     await adminUser.save();
     
     res.json({
