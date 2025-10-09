@@ -4,7 +4,7 @@ import axios from 'axios';
 const API_URL = process.env.REACT_APP_API_URL || 
                 (window.location.hostname === 'localhost' 
                   ? 'http://localhost:5000/api' 
-                  : '/api'); // Em produção, tenta usar API relativa
+                  : 'https://web-production-8843.up.railway.app/api'); // Railway backend
 
 // Configurar interceptor para adicionar token
 axios.interceptors.request.use(
