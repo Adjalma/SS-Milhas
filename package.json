@@ -4,7 +4,6 @@
   "description": "Sistema de Gestão de Milhas",
   "main": "server/index.js",
   "scripts": {
-    "prestart": "npm install --prefix server",
     "start": "node -r dotenv/config start.js",
     "build": "npm run build --prefix client",
     "install-client": "npm install --prefix client",
