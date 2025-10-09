@@ -228,12 +228,24 @@ app.post('/api/create-admin', async (req, res) => {
       });
     }
 
-    // Criar usuário admin primeiro (sem accountId)
+    // Criar Account primeiro (sem owner)
+    const Account = require('./models/Account');
+    
+    // Criar Account temporário
+    const tempAccount = new Account({
+      nome: 'Conta Principal',
+      owner: new mongoose.Types.ObjectId(), // ID temporário
+      usuarios: []
+    });
+    await tempAccount.save();
+
+    // Criar usuário admin com accountId
     const adminUser = new User({
       nome: 'Administrador',
       email: 'admin@ssmilhas.com',
       senha: 'admin123',
       role: 'admin',
+      accountId: tempAccount._id,
       status: 'ativo',
       permissions: {
         financeiro: true,
@@ -246,26 +258,14 @@ app.post('/api/create-admin', async (req, res) => {
 
     await adminUser.save();
 
-    // Agora criar Account com o admin como owner
-    const Account = require('./models/Account');
-    
-    let account = await Account.findOne({ owner: adminUser._id });
-    if (!account) {
-      account = new Account({
-        nome: 'Conta Principal',
-        owner: adminUser._id,
-        usuarios: [{
-          usuario: adminUser._id,
-          role: 'owner',
-          adicionadoEm: new Date()
-        }]
-      });
-      await account.save();
-    }
-
-    // Atualizar o usuário com o accountId
-    adminUser.accountId = account._id;
-    await adminUser.save();
+    // Atualizar Account com o admin como owner
+    tempAccount.owner = adminUser._id;
+    tempAccount.usuarios = [{
+      usuario: adminUser._id,
+      role: 'owner',
+      adicionadoEm: new Date()
+    }];
+    await tempAccount.save();
     
     res.json({
       success: true,
