@@ -106,6 +106,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 const connectDB = async () => {
   try {
+    console.log('🔍 MONGODB_URI:', process.env.MONGODB_URI ? 'DEFINIDA' : 'NÃO DEFINIDA');
     const conn = await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/gestao-milhas', {
       useNewUrlParser: true,
       useUnifiedTopology: true,
