@@ -1,16 +1,16 @@
 {
   "name": "ss-milhas",
   "version": "1.0.0",
-  "description": "Sistema completo de gestão de milhas aéreas",
+  "description": "Sistema de Gestão de Milhas",
+  "main": "server/index.js",
   "scripts": {
-    "build": "cd client && npm install && npm run build",
-    "start": "cd client && npm start",
-    "dev": "cd client && npm start"
+    "start": "cd server && npm start",
+    "build": "cd client && npm run build",
+    "install-client": "cd client && npm install",
+    "install-server": "cd server && npm install",
+    "install-all": "npm run install-client && npm run install-server"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Adjalma/SS-Milhas.git"
-  },
-  "author": "Adjalma",
-  "license": "MIT"
+  "engines": {
+    "node": ">=18.0.0"
+  }
 }
