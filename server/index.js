@@ -229,7 +229,7 @@ app.post('/api/create-admin', async (req, res) => {
     }
 
     // Criar Account
-    const Account = mongoose.model('Account', new mongoose.Schema({
+    const Account = mongoose.models.Account || mongoose.model('Account', new mongoose.Schema({
       nome: { type: String, required: true },
       email: { type: String, required: true },
       ativo: { type: Boolean, default: true }
