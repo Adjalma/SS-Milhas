@@ -104,6 +104,64 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // ==================== CONEXÃO COM BANCO DE DADOS ====================
 
+// Função para criar usuário padrão
+const createDefaultUser = async () => {
+  try {
+    const bcrypt = require('bcryptjs');
+    
+    // Usar o modelo User existente
+    const User = require('./models/User');
+
+    // Verificar se já existe usuário admin
+    const existingUser = await User.findOne({ email: 'admin@ssmilhas.com' });
+    if (existingUser) {
+      console.log('✅ Usuário admin já existe');
+      return;
+    }
+
+    // Criar Account padrão primeiro
+    const Account = mongoose.model('Account', new mongoose.Schema({
+      nome: { type: String, required: true },
+      email: { type: String, required: true },
+      ativo: { type: Boolean, default: true }
+    }, { timestamps: true }));
+
+    let account = await Account.findOne({ email: 'admin@ssmilhas.com' });
+    if (!account) {
+      account = new Account({
+        nome: 'Conta Principal',
+        email: 'admin@ssmilhas.com'
+      });
+      await account.save();
+    }
+
+    // Criar usuário admin
+    const adminUser = new User({
+      nome: 'Administrador',
+      email: 'admin@ssmilhas.com',
+      senha: 'admin123', // Será hasheada automaticamente pelo middleware
+      role: 'admin',
+      accountId: account._id,
+      status: 'ativo',
+      permissions: {
+        financeiro: true,
+        valores: true,
+        relatorios: true,
+        monitoramento: true,
+        cadastros: true
+      }
+    });
+
+    await adminUser.save();
+    console.log('✅ Usuário admin criado com sucesso!');
+    console.log('📧 Email: admin@ssmilhas.com');
+    console.log('🔑 Senha: admin123');
+
+  } catch (error) {
+    console.error('❌ Erro ao criar usuário padrão:', error.message);
+  }
+};
+
 const connectDB = async () => {
   try {
     console.log('🔍 MONGODB_URI:', process.env.MONGODB_URI ? 'DEFINIDA' : 'NÃO DEFINIDA');
@@ -113,6 +171,9 @@ const connectDB = async () => {
     });
 
     console.log(`✅ MongoDB conectado: ${conn.connection.host}`);
+    
+    // Criar usuário padrão se não existir
+    await createDefaultUser();
     
     // Configurar eventos do mongoose
     mongoose.connection.on('error', (err) => {
