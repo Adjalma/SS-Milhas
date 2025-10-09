@@ -60,7 +60,7 @@ app.use(helmet({
 // CORS configurado para permitir apenas origens específicas
 const corsOptions = {
   origin: process.env.NODE_ENV === 'production' 
-    ? ['https://ss-milhas.vercel.app', 'https://ss-milhas.com.br'] 
+    ? ['https://ss-milhas.vercel.app', 'https://ss-milhas.com.br', 'https://www.ss-milhas.com.br'] 
     : ['http://localhost:3000'],
   credentials: true,
   optionsSuccessStatus: 200
@@ -208,6 +208,78 @@ app.get('/api/health', (req, res) => {
     environment: process.env.NODE_ENV,
     version: '1.0.0'
   });
+});
+
+// Rota para criar usuário admin manualmente
+app.post('/api/create-admin', async (req, res) => {
+  try {
+    const User = require('./models/User');
+    
+    // Verificar se já existe
+    const existingUser = await User.findOne({ email: 'admin@ssmilhas.com' });
+    if (existingUser) {
+      return res.json({
+        success: true,
+        message: 'Usuário admin já existe',
+        credentials: {
+          email: 'admin@ssmilhas.com',
+          senha: 'admin123'
+        }
+      });
+    }
+
+    // Criar Account
+    const Account = mongoose.model('Account', new mongoose.Schema({
+      nome: { type: String, required: true },
+      email: { type: String, required: true },
+      ativo: { type: Boolean, default: true }
+    }, { timestamps: true }));
+
+    let account = await Account.findOne({ email: 'admin@ssmilhas.com' });
+    if (!account) {
+      account = new Account({
+        nome: 'Conta Principal',
+        email: 'admin@ssmilhas.com'
+      });
+      await account.save();
+    }
+
+    // Criar usuário admin
+    const adminUser = new User({
+      nome: 'Administrador',
+      email: 'admin@ssmilhas.com',
+      senha: 'admin123',
+      role: 'admin',
+      accountId: account._id,
+      status: 'ativo',
+      permissions: {
+        financeiro: true,
+        valores: true,
+        relatorios: true,
+        monitoramento: true,
+        cadastros: true
+      }
+    });
+
+    await adminUser.save();
+    
+    res.json({
+      success: true,
+      message: 'Usuário admin criado com sucesso!',
+      credentials: {
+        email: 'admin@ssmilhas.com',
+        senha: 'admin123'
+      }
+    });
+
+  } catch (error) {
+    console.error('Erro ao criar usuário admin:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Erro ao criar usuário admin',
+      error: error.message
+    });
+  }
 });
 
 // Rotas públicas (sem autenticação)
