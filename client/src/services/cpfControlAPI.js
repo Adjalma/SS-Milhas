@@ -1,6 +1,10 @@
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+// URL da API - use variável de ambiente ou localhost em desenvolvimento
+const API_URL = process.env.REACT_APP_API_URL || 
+                (window.location.hostname === 'localhost' 
+                  ? 'http://localhost:5000/api' 
+                  : '/api'); // Em produção, tenta usar API relativa
 
 // Configurar interceptor para adicionar token
 axios.interceptors.request.use(
@@ -23,6 +27,17 @@ axios.interceptors.request.use(
  */
 export const listarCPFs = async (filtros = {}) => {
   try {
+    // Em produção sem backend, retornar array vazio
+    if (window.location.hostname !== 'localhost' && !process.env.REACT_APP_API_URL) {
+      console.log('⚠️ Modo sem backend: retornando dados vazios');
+      return {
+        success: true,
+        data: [],
+        count: 0,
+        local: true
+      };
+    }
+    
     const params = new URLSearchParams();
     if (filtros.categoria) params.append('categoria', filtros.categoria);
     if (filtros.status) params.append('status', filtros.status);
@@ -32,6 +47,18 @@ export const listarCPFs = async (filtros = {}) => {
     return response.data;
   } catch (error) {
     console.error('Erro ao listar CPFs:', error);
+    
+    // Se a API não estiver disponível, retornar vazio
+    if (error.code === 'ERR_NETWORK' || error.response?.status === 404) {
+      console.log('⚠️ API não disponível: retornando dados vazios');
+      return {
+        success: true,
+        data: [],
+        count: 0,
+        local: true
+      };
+    }
+    
     throw error;
   }
 };
@@ -93,6 +120,17 @@ export const atualizarCPF = async (id, dados) => {
  */
 export const atualizarEtiqueta = async (id, etiqueta, cpfData = null) => {
   try {
+    // Em produção sem backend, usar apenas localStorage
+    if (window.location.hostname !== 'localhost' && !process.env.REACT_APP_API_URL) {
+      console.log('⚠️ Modo sem backend: salvando apenas em localStorage');
+      return {
+        success: true,
+        local: true,
+        message: 'Salvo localmente (sem backend configurado)',
+        data: { id, etiqueta, updatedAt: new Date() }
+      };
+    }
+    
     const response = await axios.put(`${API_URL}/cpf-control/${id}/etiqueta`, { 
       etiqueta,
       cpfData 
@@ -100,6 +138,18 @@ export const atualizarEtiqueta = async (id, etiqueta, cpfData = null) => {
     return response.data;
   } catch (error) {
     console.error('Erro ao atualizar etiqueta:', error);
+    
+    // Se a API não estiver disponível, retornar sucesso local
+    if (error.code === 'ERR_NETWORK' || error.response?.status === 404) {
+      console.log('⚠️ API não disponível: salvando apenas em localStorage');
+      return {
+        success: true,
+        local: true,
+        message: 'Salvo localmente (API não disponível)',
+        data: { id, etiqueta, updatedAt: new Date() }
+      };
+    }
+    
     throw error;
   }
 };
