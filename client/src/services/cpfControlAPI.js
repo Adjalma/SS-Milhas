@@ -6,6 +6,9 @@ const API_URL = process.env.REACT_APP_API_URL ||
                   ? 'http://localhost:5000/api' 
                   : 'https://web-production-8843.up.railway.app/api'); // Railway backend
 
+// Log para debug
+console.log('🔍 CPFControlAPI URL:', API_URL);
+
 // Configurar interceptor para adicionar token
 axios.interceptors.request.use(
   (config) => {
