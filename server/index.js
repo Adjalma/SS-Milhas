@@ -216,6 +216,16 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Endpoint para debug das variáveis de ambiente
+app.get('/api/debug/env', (req, res) => {
+  res.json({
+    JWT_SECRET: process.env.JWT_SECRET ? 'DEFINIDA' : 'NÃO DEFINIDA',
+    MONGODB_URI: process.env.MONGODB_URI ? 'DEFINIDA' : 'NÃO DEFINIDA',
+    NODE_ENV: process.env.NODE_ENV || 'undefined',
+    PORT: process.env.PORT || 'undefined'
+  });
+});
+
 // Rota para criar usuário admin manualmente
 app.post('/api/create-admin', async (req, res) => {
   try {
