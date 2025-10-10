@@ -34,6 +34,7 @@ const updateUserValidation = [
 
 // Listar usuários da conta
 router.get('/',
+  authMiddleware,
   async (req, res) => {
     try {
       // Buscar usuários sem autenticação por enquanto
@@ -323,6 +324,7 @@ router.delete('/:id',
 
 // Obter informações da conta
 router.get('/account/info',
+  authMiddleware,
   async (req, res) => {
     try {
       // Buscar conta sem autenticação por enquanto
@@ -364,6 +366,7 @@ router.get('/account/info',
 
 // Endpoint para obter perfil do usuário
 router.get('/profile',
+  authMiddleware,
   async (req, res) => {
     try {
       // Mock data para teste
@@ -398,61 +401,5 @@ router.get('/profile',
   }
 );
 
-// Endpoint para criar usuário
-router.post('/',
-  async (req, res) => {
-    try {
-      console.log('Dados recebidos:', req.body);
-      const { nome, email, senha, role } = req.body;
-      
-      // Validar dados
-      if (!nome || !email || !senha || !role) {
-        console.log('Dados inválidos:', { nome, email, senha: senha ? '***' : 'undefined', role });
-        return res.status(400).json({
-          success: false,
-          message: 'Dados obrigatórios: nome, email, senha, role'
-        });
-      }
-      
-      // Verificar se email já existe
-      const existingUser = await User.findOne({ email });
-      if (existingUser) {
-        return res.status(400).json({
-          success: false,
-          message: 'Email já está em uso'
-        });
-      }
-      
-      // Criar usuário
-      const hashedPassword = await bcrypt.hash(senha, 12);
-      const newUser = new User({
-        nome,
-        email,
-        senha: hashedPassword,
-        role,
-        status: 'ativo'
-      });
-      
-      await newUser.save();
-      
-      // Remover senha da resposta
-      const userResponse = newUser.toObject();
-      delete userResponse.senha;
-      
-      res.status(201).json({
-        success: true,
-        message: 'Usuário criado com sucesso',
-        data: userResponse
-      });
-      
-    } catch (error) {
-      console.error('Erro ao criar usuário:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Erro interno do servidor: ' + error.message
-      });
-    }
-  }
-);
 
 module.exports = router;
