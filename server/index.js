@@ -275,6 +275,41 @@ app.post('/api/create-admin', async (req, res) => {
         senha: 'admin123'
       }
     });
+  } catch (error) {
+    console.error('Erro ao criar usuário admin:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Erro ao criar usuário admin',
+      error: error.message
+    });
+  }
+});
+
+// Rota para resetar senha do admin
+app.post('/api/reset-admin-password', async (req, res) => {
+  try {
+    const User = require('./models/User');
+    
+    const user = await User.findOne({ email: 'admin@ssmilhas.com' });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Usuário admin não encontrado'
+      });
+    }
+
+    // Resetar senha
+    user.senha = 'admin123';
+    await user.save();
+
+    res.json({
+      success: true,
+      message: 'Senha do admin resetada com sucesso!',
+      credentials: {
+        email: 'admin@ssmilhas.com',
+        senha: 'admin123'
+      }
+    });
 
   } catch (error) {
     console.error('Erro ao criar usuário admin:', error);
