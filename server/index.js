@@ -20,6 +20,12 @@ const mongoSanitize = require('express-mongo-sanitize');
 const path = require('path');
 require('dotenv').config();
 
+// Debug: Verificar se as variáveis de ambiente estão sendo carregadas
+console.log('🔍 Verificando variáveis de ambiente:');
+console.log('🔍 JWT_SECRET:', process.env.JWT_SECRET ? 'DEFINIDA' : 'NÃO DEFINIDA');
+console.log('🔍 MONGODB_URI:', process.env.MONGODB_URI ? 'DEFINIDA' : 'NÃO DEFINIDA');
+console.log('🔍 NODE_ENV:', process.env.NODE_ENV);
+
 // Importar modelos
 require('./models/User');
 require('./models/Account');
