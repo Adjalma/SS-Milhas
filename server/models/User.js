@@ -309,13 +309,19 @@ userSchema.methods.verificarSenha = async function(senhaCandidata) {
 
 // Gerar token JWT
 userSchema.methods.gerarTokenJWT = function() {
+  const secret = process.env.JWT_SECRET || 'fallback_secret_key_for_development_only';
+  
+  if (!process.env.JWT_SECRET) {
+    console.warn('⚠️ JWT_SECRET não definida, usando fallback!');
+  }
+  
   return jwt.sign(
     { 
       id: this._id, 
       email: this.email, 
       role: this.role 
     },
-    process.env.JWT_SECRET,
+    secret,
     { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
   );
 };

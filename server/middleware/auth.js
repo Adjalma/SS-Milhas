@@ -42,7 +42,8 @@ const authMiddleware = async (req, res, next) => {
     }
 
     // Verificar e decodificar o token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const secret = process.env.JWT_SECRET || 'fallback_secret_key_for_development_only';
+    const decoded = jwt.verify(token, secret);
     
     // Buscar usuário no banco de dados
     const user = await User.findById(decoded.id).select('-senha -refreshTokens');
@@ -328,7 +329,8 @@ const optionalAuth = async (req, res, next) => {
       return next();
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const secret = process.env.JWT_SECRET || 'fallback_secret_key_for_development_only';
+    const decoded = jwt.verify(token, secret);
     const user = await User.findById(decoded.id).select('-senha -refreshTokens');
     
     if (user && user.status === 'ativo') {
