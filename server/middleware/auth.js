@@ -329,7 +329,8 @@ const optionalAuth = async (req, res, next) => {
       return next();
     }
 
-    const secret = process.env.JWT_SECRET || 'fallback_secret_key_for_development_only';
+    // TEMPORÁRIO: Hardcode para garantir que funcione
+    const secret = 'sua_senha_super_secreta_aqui_qualquer_coisa_longa_e_segura';
     const decoded = jwt.verify(token, secret);
     const user = await User.findById(decoded.id).select('-senha -refreshTokens');
     

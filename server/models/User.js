@@ -311,10 +311,6 @@ userSchema.methods.verificarSenha = async function(senhaCandidata) {
 userSchema.methods.gerarTokenJWT = function() {
   const secret = process.env.JWT_SECRET || 'fallback_secret_key_for_development_only';
   
-  if (!process.env.JWT_SECRET) {
-    console.warn('⚠️ JWT_SECRET não definida, usando fallback!');
-  }
-  
   return jwt.sign(
     { 
       id: this._id, 
@@ -328,9 +324,11 @@ userSchema.methods.gerarTokenJWT = function() {
 
 // Gerar refresh token
 userSchema.methods.gerarRefreshToken = function() {
+  const refreshSecret = process.env.REFRESH_TOKEN_SECRET || process.env.JWT_SECRET || 'fallback_refresh_secret';
+  
   const refreshToken = jwt.sign(
     { id: this._id },
-    process.env.REFRESH_TOKEN_SECRET,
+    refreshSecret,
     { expiresIn: '30d' }
   );
   

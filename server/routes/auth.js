@@ -283,7 +283,8 @@ router.post('/refresh',
     }
 
     // Verificar refresh token
-    const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+    const refreshSecret = process.env.REFRESH_TOKEN_SECRET || process.env.JWT_SECRET || 'fallback_refresh_secret';
+    const decoded = jwt.verify(refreshToken, refreshSecret);
     const user = await User.findById(decoded.id);
 
     if (!user) {
