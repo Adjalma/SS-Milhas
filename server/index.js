@@ -226,6 +226,32 @@ app.get('/api/debug/env', (req, res) => {
   });
 });
 
+// Endpoint para testar JWT
+app.get('/api/debug/jwt', (req, res) => {
+  try {
+    const jwt = require('jsonwebtoken');
+    const secret = process.env.JWT_SECRET || 'fallback_secret_key_for_development_only';
+    
+    const token = jwt.sign(
+      { test: 'test' },
+      secret,
+      { expiresIn: '1h' }
+    );
+    
+    res.json({
+      success: true,
+      message: 'JWT funcionando',
+      token: token,
+      secret: secret ? 'DEFINIDA' : 'NÃO DEFINIDA'
+    });
+  } catch (error) {
+    res.json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
 // Rota para criar usuário admin manualmente
 app.post('/api/create-admin', async (req, res) => {
   try {
