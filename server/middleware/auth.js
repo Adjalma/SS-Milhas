@@ -65,8 +65,8 @@ const authMiddleware = async (req, res, next) => {
       });
     }
 
-    // Verificar se o email foi verificado
-    if (!user.emailVerified) {
+    // Verificar se o email foi verificado (liberar admins mesmo sem verificação)
+    if (!user.emailVerified && user.role !== 'admin') {
       return res.status(403).json({
         success: false,
         message: 'Email não verificado. Verifique sua caixa de entrada.',
