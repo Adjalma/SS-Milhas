@@ -79,7 +79,7 @@ router.post('/',
         });
       }
       
-      const { nome, email, senha, role } = req.body;
+      const { nome, email, senha, role, permissions: permissionsFromBody } = req.body;
       const currentUserId = req.user.id;
       
       // Buscar usuário atual e conta
@@ -109,24 +109,18 @@ router.post('/',
         });
       }
       
-      // Definir permissões baseadas no role
-      let permissions = {
-        financeiro: false,
-        valores: false,
-        relatorios: false,
-        monitoramento: true,
-        cadastros: false
+      // Definir permissões: se vier no body, usar; senão, aplicar padrão por role
+      const defaultByRole = role === 'admin'
+        ? { financeiro: true, valores: true, relatorios: true, monitoramento: true, cadastros: true }
+        : { financeiro: false, valores: false, relatorios: false, monitoramento: true, cadastros: false };
+
+      const permissions = {
+        financeiro: Boolean(permissionsFromBody?.financeiro ?? defaultByRole.financeiro),
+        valores: Boolean(permissionsFromBody?.valores ?? defaultByRole.valores),
+        relatorios: Boolean(permissionsFromBody?.relatorios ?? defaultByRole.relatorios),
+        monitoramento: Boolean(permissionsFromBody?.monitoramento ?? defaultByRole.monitoramento),
+        cadastros: Boolean(permissionsFromBody?.cadastros ?? defaultByRole.cadastros)
       };
-      
-      if (role === 'admin') {
-        permissions = {
-          financeiro: true,
-          valores: true,
-          relatorios: true,
-          monitoramento: true,
-          cadastros: true
-        };
-      }
       
       // Criar usuário
       const hashedPassword = await bcrypt.hash(senha, 12);
@@ -182,7 +176,7 @@ router.put('/:id',
       }
       
       const { id } = req.params;
-      const { nome, email, role } = req.body;
+      const { nome, email, role, permissions: permissionsFromBody } = req.body;
       const currentUserId = req.user.id;
       
       // Buscar usuário atual e conta
@@ -215,8 +209,8 @@ router.put('/:id',
       }
       
       // Atualizar dados
-      if (nome) userToEdit.nome = nome;
-      if (email) userToEdit.email = email;
+      if (nome !== undefined) userToEdit.nome = nome;
+      if (email !== undefined) userToEdit.email = email;
       if (role) {
         userToEdit.role = role;
         
@@ -238,6 +232,17 @@ router.put('/:id',
             cadastros: false
           };
         }
+      }
+
+      // Se veio permissions no body, aplicar granularmente
+      if (permissionsFromBody) {
+        userToEdit.permissions = {
+          financeiro: Boolean(permissionsFromBody.financeiro ?? userToEdit.permissions.financeiro),
+          valores: Boolean(permissionsFromBody.valores ?? userToEdit.permissions.valores),
+          relatorios: Boolean(permissionsFromBody.relatorios ?? userToEdit.permissions.relatorios),
+          monitoramento: Boolean(permissionsFromBody.monitoramento ?? userToEdit.permissions.monitoramento),
+          cadastros: Boolean(permissionsFromBody.cadastros ?? userToEdit.permissions.cadastros)
+        };
       }
       
       await userToEdit.save();
