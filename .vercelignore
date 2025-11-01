@@ -1,0 +1,63 @@
+# Dependências
+node_modules/
+*/node_modules/
+
+# Ambiente de desenvolvimento
+.env
+.env.local
+.env.*.local
+server/.env
+server/ai/.env
+
+# Logs
+*.log
+logs/
+
+# Sistema IA Python
+server/ai/venv_ai/
+server/ai/__pycache__/
+server/ai/*.session
+**/__pycache__/
+*.py[cod]
+
+# Uploads e dados temporários
+uploads/
+server/uploads/
+data/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testes
+coverage/
+.nyc_output/
+
+# Build (não ignorar client/build pois é necessário para deploy)
+# client/build mantém para Vercel usar
+
+# Scripts locais
+scripts/*.sh
+scripts/*.bat
+
+# Documentação local
+docs/
+*.md
+!README.md
+
+# Docker
+Dockerfile*
+docker-compose.yml
+nginx.conf
+
+# Arquivos de configuração local
+*.bak
+*.tmp
+*.temp
+
