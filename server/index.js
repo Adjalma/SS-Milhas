@@ -32,6 +32,11 @@ require('./models/Account');
 require('./models/CPFControl');
 require('./models/Movement');
 require('./models/ScheduledTransaction');
+require('./models/Income');
+require('./models/Expense');
+require('./models/CashFlow');
+require('./models/BankAccount');
+require('./models/Card');
 
 // Importar rotas
 const authRoutes = require('./routes/auth');
@@ -44,6 +49,7 @@ const notificationRoutes = require('./routes/notifications');
 const programRoutes = require('./routes/programs');
 const cpfControlRoutes = require('./routes/cpfControl');
 const movementRoutes = require('./routes/movements');
+const financialRoutes = require('./routes/financial');
 
 // Importar middlewares
 const { errorHandler } = require('./middleware/errorHandler');
@@ -377,6 +383,7 @@ app.use('/api/usuarios', authMiddleware, require('./routes/users'));
 app.use('/api/accounts', authMiddleware, accountRoutes);
 app.use('/api/transactions', authMiddleware, transactionRoutes);
 app.use('/api/movements', authMiddleware, movementRoutes);
+app.use('/api/financial', authMiddleware, financialRoutes);
 app.use('/api/dashboard', authMiddleware, dashboardRoutes);
 app.use('/api/reports', authMiddleware, reportRoutes);
 app.use('/api/notifications', authMiddleware, notificationRoutes);
