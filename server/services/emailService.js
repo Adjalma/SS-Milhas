@@ -14,7 +14,12 @@ const path = require('path');
 class EmailService {
   constructor() {
     this.transporter = null;
-    this.initializeTransporter();
+    this.emailEnabled = String(process.env.EMAIL_ENABLED || '').toLowerCase() !== 'false';
+    if (this.emailEnabled) {
+      this.initializeTransporter();
+    } else {
+      console.log('✉️ Email desabilitado (EMAIL_ENABLED=false).');
+    }
   }
 
   /**
@@ -22,6 +27,7 @@ class EmailService {
    */
   initializeTransporter() {
     try {
+      if (!this.emailEnabled) return;
       this.transporter = nodemailer.createTransport({
         service: process.env.EMAIL_SERVICE || 'gmail',
         auth: {
@@ -50,6 +56,7 @@ class EmailService {
    * Enviar email de verificação
    */
   async sendVerificationEmail(email, token) {
+    if (!this.emailEnabled) return;
     const verificationUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/verificar-email?token=${token}`;
     
     const mailOptions = {
@@ -104,6 +111,7 @@ class EmailService {
    * Enviar email de recuperação de senha
    */
   async sendPasswordResetEmail(email, token) {
+    if (!this.emailEnabled) return;
     const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/redefinir-senha?token=${token}`;
     
     const mailOptions = {
@@ -166,6 +174,7 @@ class EmailService {
    * Enviar email de notificação
    */
   async sendNotificationEmail(email, subject, message, type = 'info') {
+    if (!this.emailEnabled) return;
     const colors = {
       info: '#3B82F6',
       success: '#10B981',
