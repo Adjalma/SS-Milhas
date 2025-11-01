@@ -30,6 +30,8 @@ console.log('🔍 NODE_ENV:', process.env.NODE_ENV);
 require('./models/User');
 require('./models/Account');
 require('./models/CPFControl');
+require('./models/Movement');
+require('./models/ScheduledTransaction');
 
 // Importar rotas
 const authRoutes = require('./routes/auth');
@@ -41,6 +43,7 @@ const reportRoutes = require('./routes/reports');
 const notificationRoutes = require('./routes/notifications');
 const programRoutes = require('./routes/programs');
 const cpfControlRoutes = require('./routes/cpfControl');
+const movementRoutes = require('./routes/movements');
 
 // Importar middlewares
 const { errorHandler } = require('./middleware/errorHandler');
@@ -373,6 +376,7 @@ app.use('/api/users', authMiddleware, userRoutes);
 app.use('/api/usuarios', authMiddleware, require('./routes/users'));
 app.use('/api/accounts', authMiddleware, accountRoutes);
 app.use('/api/transactions', authMiddleware, transactionRoutes);
+app.use('/api/movements', authMiddleware, movementRoutes);
 app.use('/api/dashboard', authMiddleware, dashboardRoutes);
 app.use('/api/reports', authMiddleware, reportRoutes);
 app.use('/api/notifications', authMiddleware, notificationRoutes);
