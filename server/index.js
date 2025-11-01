@@ -52,6 +52,7 @@ const cpfControlRoutes = require('./routes/cpfControl');
 const movementRoutes = require('./routes/movements');
 const financialRoutes = require('./routes/financial');
 const taskRoutes = require('./routes/tasks');
+const aiRoutes = require('./routes/ai');
 
 // Importar middlewares
 const { errorHandler } = require('./middleware/errorHandler');
@@ -387,6 +388,7 @@ app.use('/api/transactions', authMiddleware, transactionRoutes);
 app.use('/api/movements', authMiddleware, movementRoutes);
 app.use('/api/financial', authMiddleware, financialRoutes);
 app.use('/api/tasks', authMiddleware, taskRoutes);
+app.use('/api/ai', authMiddleware, aiRoutes);
 app.use('/api/dashboard', authMiddleware, dashboardRoutes);
 app.use('/api/reports', authMiddleware, reportRoutes);
 app.use('/api/notifications', authMiddleware, notificationRoutes);
