@@ -105,33 +105,6 @@ const Transferencia = () => {
   });
   const [openDialog, setOpenDialog] = useState(false);
 
-  // Dados mockados
-  const [transferencias] = useState([
-    {
-      id: 1,
-      origem: { pessoa: 'João Silva', programa: 'LATAM Pass', quantidade: 10000 },
-      destino: { pessoa: 'Maria Santos', programa: 'LATAM Pass', quantidade: 10000 },
-      tipoTransferencia: 'interna',
-      taxa: 0,
-      valorTotal: 0,
-      dataTransferencia: '2024-01-15',
-      observacoes: 'Transferência familiar',
-      status: 'concluida',
-      dataConclusao: '2024-01-15'
-    },
-    {
-      id: 2,
-      origem: { pessoa: 'Pedro Oliveira', programa: 'Smiles', quantidade: 25000 },
-      destino: { pessoa: 'Ana Costa', programa: 'TudoAzul', quantidade: 25000 },
-      tipoTransferencia: 'externa',
-      taxa: 50.00,
-      valorTotal: 50.00,
-      dataTransferencia: '2024-01-14',
-      observacoes: 'Transferência entre programas',
-      status: 'processando'
-    }
-  ]);
-
   const programasFidelidade = [
     'LATAM Pass', 'Smiles', 'TudoAzul', 'Livelo', 'LifeMiles',
     'Emirates Skywards', 'Delta SkyMiles', 'Flying Blue'

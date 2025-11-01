@@ -108,59 +108,6 @@ const Venda = () => {
     lucroEstimado: ''
   });
 
-  // Dados mockados baseados nas imagens
-  const [vendas] = useState([
-    {
-      id: 1,
-      pessoa: 'João Silva',
-      programa: 'LATAM Pass',
-      quantidade: 25000,
-      valorPorMilha: 0.035,
-      valorTotal: 875.00,
-      cliente: 'Cliente VIP #1',
-      tipoCliente: 'pessoa_fisica',
-      comissao: 87.50,
-      lucroReal: 262.50,
-      margem: 30.0,
-      dataVenda: '2024-01-15',
-      status: 'concluida',
-      dataConclusao: '2024-01-15',
-      observacoes: 'Venda para cliente recorrente'
-    },
-    {
-      id: 2,
-      pessoa: 'Maria Santos',
-      programa: 'Smiles',
-      quantidade: 15000,
-      valorPorMilha: 0.030,
-      valorTotal: 450.00,
-      cliente: 'Cliente Premium #2',
-      tipoCliente: 'pessoa_fisica',
-      comissao: 45.00,
-      lucroReal: 135.00,
-      margem: 30.0,
-      dataVenda: '2024-01-14',
-      status: 'processando',
-      observacoes: 'Aguardando transferência'
-    },
-    {
-      id: 3,
-      pessoa: 'Pedro Oliveira',
-      programa: 'TudoAzul',
-      quantidade: 30000,
-      valorPorMilha: 0.040,
-      valorTotal: 1200.00,
-      cliente: 'Empresa ABC Ltda',
-      tipoCliente: 'pessoa_juridica',
-      comissao: 120.00,
-      lucroReal: 360.00,
-      margem: 30.0,
-      dataVenda: '2024-01-13',
-      status: 'pendente',
-      observacoes: 'Venda corporativa'
-    }
-  ]);
-
   const programasFidelidade = [
     'LATAM Pass', 'Smiles', 'TudoAzul', 'Livelo', 'LifeMiles',
     'Emirates Skywards', 'Delta SkyMiles', 'Flying Blue'

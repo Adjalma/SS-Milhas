@@ -107,66 +107,6 @@ const Transferencia = () => {
     dataAgendamento: ''
   });
 
-  // Dados mockados baseados nas imagens
-  const [transferencias] = useState([
-    {
-      id: 1,
-      tipo: 'entre_contas',
-      contaOrigem: 'Conta Corrente BB',
-      contaDestino: 'Poupança BB',
-      valor: 5000.00,
-      descricao: 'Transferência para poupança',
-      dataTransferencia: '2024-01-15',
-      dataProcessamento: '2024-01-15',
-      status: 'processada',
-      observacoes: 'Transferência mensal para reserva',
-      taxa: 0.00,
-      numeroOperacao: 'TXN-001'
-    },
-    {
-      id: 2,
-      tipo: 'para_pessoa',
-      contaOrigem: 'Conta Corrente BB',
-      contaDestino: 'João Silva - PIX',
-      valor: 875.00,
-      descricao: 'Pagamento venda de milhas',
-      dataTransferencia: '2024-01-14',
-      dataProcessamento: '2024-01-14',
-      status: 'processada',
-      observacoes: 'Pagamento referente venda LATAM Pass',
-      taxa: 2.50,
-      numeroOperacao: 'TXN-002'
-    },
-    {
-      id: 3,
-      tipo: 'entre_contas',
-      contaOrigem: 'Conta Corrente Itaú',
-      contaDestino: 'Conta Corrente BB',
-      valor: 2000.00,
-      descricao: 'Transferência para conta principal',
-      dataTransferencia: '2024-01-16',
-      dataProcessamento: '',
-      status: 'pendente',
-      observacoes: 'Consolidação de recursos',
-      taxa: 5.00,
-      numeroOperacao: 'TXN-003'
-    },
-    {
-      id: 4,
-      tipo: 'para_pessoa',
-      contaOrigem: 'Poupança BB',
-      contaDestino: 'Maria Santos - PIX',
-      valor: 450.00,
-      descricao: 'Comissão de transferência',
-      dataTransferencia: '2024-01-17',
-      dataProcessamento: '',
-      status: 'agendada',
-      observacoes: 'Comissão mensal',
-      taxa: 0.00,
-      numeroOperacao: 'TXN-004'
-    }
-  ]);
-
   const tiposTransferencia = [
     { value: 'entre_contas', label: 'Entre Contas' },
     { value: 'para_pessoa', label: 'Para Pessoa' }

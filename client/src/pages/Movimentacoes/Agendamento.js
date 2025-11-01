@@ -106,55 +106,6 @@ const Agendamento = () => {
     status: 'agendado'
   });
 
-  // Dados mockados baseados nas imagens
-  const [agendamentos] = useState([
-    {
-      id: 1,
-      tipoOperacao: 'compra',
-      pessoa: 'João Silva',
-      programa: 'LATAM Pass',
-      quantidade: 25000,
-      valor: 750.00,
-      dataAgendamento: '2024-01-20',
-      horario: '14:30',
-      observacoes: 'Compra programada para promoção',
-      notificarAntes: true,
-      minutosAntes: 30,
-      status: 'agendado',
-      dataCriacao: '2024-01-15'
-    },
-    {
-      id: 2,
-      tipoOperacao: 'transferencia',
-      pessoa: 'Maria Santos',
-      programa: 'Smiles',
-      quantidade: 15000,
-      valor: 0,
-      dataAgendamento: '2024-01-22',
-      horario: '10:00',
-      observacoes: 'Transferência para cônjuge',
-      notificarAntes: true,
-      minutosAntes: 60,
-      status: 'agendado',
-      dataCriacao: '2024-01-16'
-    },
-    {
-      id: 3,
-      tipoOperacao: 'venda',
-      pessoa: 'Pedro Oliveira',
-      programa: 'TudoAzul',
-      quantidade: 30000,
-      valor: 900.00,
-      dataAgendamento: '2024-01-18',
-      horario: '16:45',
-      observacoes: 'Venda programada',
-      notificarAntes: false,
-      minutosAntes: 0,
-      status: 'executado',
-      dataExecucao: '2024-01-18'
-    }
-  ]);
-
   const tiposOperacao = [
     { value: 'compra', label: 'Compra de Milhas', icon: '🛒', color: 'primary' },
     { value: 'venda', label: 'Venda de Milhas', icon: '💰', color: 'success' },

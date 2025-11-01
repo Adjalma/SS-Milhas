@@ -112,67 +112,6 @@ const Passagem = () => {
     status: 'pendente'
   });
 
-  // Dados mockados baseados nas imagens
-  const [passagens] = useState([
-    {
-      id: 1,
-      pessoa: 'João Silva',
-      programa: 'LATAM Pass',
-      origem: 'São Paulo (GRU)',
-      destino: 'Rio de Janeiro (GIG)',
-      dataIda: '2024-01-20',
-      dataVolta: '2024-01-25',
-      classe: 'economica',
-      quantidadeMilhas: 15000,
-      taxaEmbarque: 89.50,
-      valorTotal: 539.50,
-      passageiros: 1,
-      tipoVoo: 'ida_volta',
-      numeroReserva: 'LAT123456',
-      status: 'confirmada',
-      dataCompra: '2024-01-15',
-      observacoes: 'Viagem de negócios'
-    },
-    {
-      id: 2,
-      pessoa: 'Maria Santos',
-      programa: 'Smiles',
-      origem: 'Brasília (BSB)',
-      destino: 'São Paulo (GRU)',
-      dataIda: '2024-01-22',
-      dataVolta: null,
-      classe: 'executiva',
-      quantidadeMilhas: 25000,
-      taxaEmbarque: 125.00,
-      valorTotal: 875.00,
-      passageiros: 2,
-      tipoVoo: 'ida',
-      numeroReserva: 'SMI789012',
-      status: 'pendente',
-      dataCompra: '2024-01-16',
-      observacoes: 'Viagem familiar'
-    },
-    {
-      id: 3,
-      pessoa: 'Pedro Oliveira',
-      programa: 'TudoAzul',
-      origem: 'Rio de Janeiro (GIG)',
-      destino: 'Fortaleza (FOR)',
-      dataIda: '2024-01-25',
-      dataVolta: '2024-01-30',
-      classe: 'economica',
-      quantidadeMilhas: 20000,
-      taxaEmbarque: 95.00,
-      valorTotal: 695.00,
-      passageiros: 1,
-      tipoVoo: 'ida_volta',
-      numeroReserva: 'AZU345678',
-      status: 'cancelada',
-      dataCompra: '2024-01-18',
-      observacoes: 'Cancelamento por motivos pessoais'
-    }
-  ]);
-
   const programasFidelidade = [
     'LATAM Pass', 'Smiles', 'TudoAzul', 'Livelo', 'LifeMiles',
     'Emirates Skywards', 'Delta SkyMiles', 'Flying Blue'

@@ -106,52 +106,6 @@ const Processos = () => {
     etiqueta: 'todos'
   });
 
-  // Dados mockados dos processos
-  const [processos, setProcessos] = useState([
-    {
-      id: 1,
-      titulo: 'Compra de milhas LATAM Pass',
-      descricao: 'Processo de compra de 50.000 milhas para cliente VIP',
-      pessoa: 'João Silva',
-      etiqueta: 'VIP',
-      prioridade: 'alta',
-      prazo: '2024-01-25',
-      status: 'aguardando',
-      dataCriacao: '2024-01-15',
-      responsavel: 'Maria Santos',
-      progresso: 0,
-      observacoes: 'Cliente solicitou urgência'
-    },
-    {
-      id: 2,
-      titulo: 'Transferência entre contas',
-      descricao: 'Transferir 25.000 milhas da conta A para conta B',
-      pessoa: 'Empresa ABC',
-      etiqueta: 'Normal',
-      prioridade: 'media',
-      prazo: '2024-01-30',
-      status: 'em_andamento',
-      dataCriacao: '2024-01-14',
-      responsavel: 'Pedro Costa',
-      progresso: 60,
-      observacoes: 'Aguardando confirmação do cliente'
-    },
-    {
-      id: 3,
-      titulo: 'Venda de milhas Smiles',
-      descricao: 'Venda de 30.000 milhas Smiles para terceiros',
-      pessoa: 'Ana Oliveira',
-      etiqueta: 'Urgente',
-      prioridade: 'alta',
-      prazo: '2024-01-20',
-      status: 'concluido',
-      dataCriacao: '2024-01-10',
-      responsavel: 'Carlos Lima',
-      progresso: 100,
-      observacoes: 'Processo finalizado com sucesso'
-    }
-  ]);
-
   const pessoas = ['João Silva', 'Maria Santos', 'Empresa ABC', 'Ana Oliveira', 'Pedro Costa'];
   const etiquetas = ['VIP', 'Urgente', 'Normal', 'Baixa Prioridade'];
   const prioridades = [
