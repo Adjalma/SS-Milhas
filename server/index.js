@@ -103,10 +103,26 @@ app.use(helmet({
 app.use(additionalSecurityHeaders);
 
 // 3. CORS configurado para permitir apenas origens específicas
+const allowedOrigins = [
+  'https://ss-milhas.vercel.app',
+  'https://ss-milhas.com.br',
+  'https://www.ss-milhas.com.br',
+  'http://localhost:3000',
+  'http://localhost:3001'
+];
+
 const corsOptions = {
-  origin: process.env.NODE_ENV === 'production' 
-    ? ['https://ss-milhas.vercel.app', 'https://ss-milhas.com.br', 'https://www.ss-milhas.com.br'] 
-    : ['http://localhost:3000', 'http://localhost:3001'],
+  origin: function (origin, callback) {
+    // Permite requisições sem origin (ex: mobile apps, curl, Postman)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      console.log('❌ CORS bloqueado para origem:', origin);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   optionsSuccessStatus: 200,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
