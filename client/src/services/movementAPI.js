@@ -311,6 +311,29 @@ const movementAPI = {
       status: 'pendente',
       ...data
     });
+  },
+
+  // ==================== ALIASES ====================
+
+  /**
+   * Alias para getScheduled (compatibilidade)
+   */
+  getScheduledTransactions: async (params = {}) => {
+    return movementAPI.getScheduled(params);
+  },
+
+  /**
+   * Alias para getMovements (compatibilidade)
+   */
+  getMovements: async (params = {}) => {
+    return movementAPI.getAll(params);
+  },
+
+  /**
+   * Alias para createMovement (compatibilidade)
+   */
+  createMovement: async (data) => {
+    return movementAPI.create(data);
   }
 };
 
