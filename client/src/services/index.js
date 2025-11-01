@@ -8,11 +8,11 @@
  */
 
 import api from './api';
-import * as movementAPI from './movementAPI';
-import * as financialAPI from './financialAPI';
-import * as taskAPI from './taskAPI';
-import * as dashboardAPI from './dashboardAPI';
-import * as reportAPI from './reportAPI';
+import movementAPI from './movementAPI';
+import financialAPI from './financialAPI';
+import taskAPI from './taskAPI';
+import dashboardAPI from './dashboardAPI';
+import reportAPI from './reportAPI';
 
 export {
   api,
