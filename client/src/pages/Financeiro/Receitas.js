@@ -69,11 +69,14 @@ import {
   AccountBalance
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
+import { financialAPI } from '../../services';
 
 const Receitas = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
+  const [receitas, setReceitas] = useState([]);
+  const [error, setError] = useState(null);
   const [formData, setFormData] = useState({
     descricao: '',
     categoria: '',
@@ -87,51 +90,26 @@ const Receitas = () => {
     totalParcelas: 1
   });
 
-  // Dados mockados baseados nas imagens
-  const [receitas] = useState([
-    {
-      id: 1,
-      descricao: 'Venda de milhas LATAM Pass',
-      categoria: 'vendas',
-      valor: 875.00,
-      dataRecebimento: '2024-01-15',
-      cliente: 'João Silva',
-      formaPagamento: 'pix',
-      status: 'recebido',
-      observacoes: 'Venda para cliente VIP',
-      parcela: 1,
-      totalParcelas: 1,
-      dataVencimento: '2024-01-15'
-    },
-    {
-      id: 2,
-      descricao: 'Comissão de transferência',
-      categoria: 'comissoes',
-      valor: 150.00,
-      dataRecebimento: '2024-01-14',
-      cliente: 'Maria Santos',
-      formaPagamento: 'transferencia',
-      status: 'recebido',
-      observacoes: 'Comissão mensal',
-      parcela: 1,
-      totalParcelas: 1,
-      dataVencimento: '2024-01-14'
-    },
-    {
-      id: 3,
-      descricao: 'Venda de milhas Smiles',
-      categoria: 'vendas',
-      valor: 450.00,
-      dataRecebimento: '2024-01-16',
-      cliente: 'Pedro Oliveira',
-      formaPagamento: 'cartao',
-      status: 'pendente',
-      observacoes: 'Aguardando confirmação',
-      parcela: 1,
-      totalParcelas: 1,
-      dataVencimento: '2024-01-16'
+  // Buscar receitas do backend
+  const fetchReceitas = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await financialAPI.getIncomes();
+      setReceitas(response.incomes || []);
+    } catch (err) {
+      console.error('Erro ao buscar receitas:', err);
+      setError('Erro ao carregar receitas. Tente novamente.');
+      setReceitas([]);
+    } finally {
+      setLoading(false);
     }
-  ]);
+  };
+
+  // Carregar receitas ao montar o componente
+  React.useEffect(() => {
+    fetchReceitas();
+  }, []);
 
   const categorias = [
     'Vendas', 'Comissões', 'Reembolsos', 'Juros', 'Outros'
@@ -159,12 +137,21 @@ const Receitas = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setError(null);
     
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      console.log('Receita registrada:', formData);
+      // Criar receita no backend
+      await financialAPI.createIncome({
+        tipo: 'receita',
+        ...formData,
+        data: formData.dataRecebimento
+      });
       
-      // Reset form
+      // Recarregar lista
+      await fetchReceitas();
+      
+      // Fechar dialog e reset form
+      setOpenDialog(false);
       setFormData({
         descricao: '',
         categoria: '',
@@ -182,6 +169,7 @@ const Receitas = () => {
       
     } catch (error) {
       console.error('Erro ao registrar receita:', error);
+      setError(error.response?.data?.message || 'Erro ao salvar receita. Tente novamente.');
     } finally {
       setLoading(false);
     }

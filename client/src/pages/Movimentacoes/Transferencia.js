@@ -61,10 +61,30 @@ import {
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
 import { motion } from 'framer-motion';
+import { movementAPI } from '../../services';
 
 const Transferencia = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [transferencias, setTransferencias] = useState([]);
+
+  const fetchTransferencias = async () => {
+    try {
+      setLoading(true);
+      const res = await movementAPI.getMovements({ tipo: 'transferencia' });
+      setTransferencias(res.movements || []);
+    } catch (err) {
+      setError('Erro ao carregar transferências');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchTransferencias();
+  }, []);
+
   const [activeStep, setActiveStep] = useState(0);
   const [formData, setFormData] = useState({
     origem: {

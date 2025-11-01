@@ -65,10 +65,30 @@ import {
   Alarm
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
+import { movementAPI } from '../../services';
 
 const Agendamento = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [agendamentos, setAgendamentos] = useState([]);
+
+  const fetchAgendamentos = async () => {
+    try {
+      setLoading(true);
+      const res = await movementAPI.getScheduledTransactions();
+      setAgendamentos(res.transactions || []);
+    } catch (err) {
+      setError('Erro ao carregar agendamentos');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchAgendamentos();
+  }, []);
+  
   const [viewType, setViewType] = useState('calendario'); // calendario, lista
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [openDialog, setOpenDialog] = useState(false);

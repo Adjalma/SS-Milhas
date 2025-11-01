@@ -64,10 +64,29 @@ import {
   ScatterChart, Scatter, ReferenceLine
 } from 'recharts';
 import { useAuth } from '../../contexts/AuthContext';
+import { reportAPI } from '../../services';
 
 const Evolucao = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [evolucao, setEvolucao] = useState({ series: [], totais: {} });
+
+  const fetchEvolucao = async () => {
+    try {
+      setLoading(true);
+      const res = await reportAPI.getEvolutionReport();
+      setEvolucao(res);
+    } catch (err) {
+      setError('Erro ao carregar evolução');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchEvolucao();
+  }, []);
   const [viewType, setViewType] = useState('linha'); // linha, barra, area, scatter
   const [periodo, setPeriodo] = useState('12meses');
   const [mostrarProjecao, setMostrarProjecao] = useState(true);

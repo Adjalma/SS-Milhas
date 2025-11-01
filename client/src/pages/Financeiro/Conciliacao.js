@@ -68,10 +68,29 @@ import {
   Assessment
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
+import { financialAPI } from '../../services';
 
 const Conciliacao = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [conciliacoes, setConciliacoes] = useState([]);
+
+  const fetchConciliacoes = async () => {
+    try {
+      setLoading(true);
+      const res = await financialAPI.getBankAccounts();
+      setConciliacoes(res.accounts || []);
+    } catch (err) {
+      setError('Erro ao carregar conciliações');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchConciliacoes();
+  }, []);
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedPeriod, setSelectedPeriod] = useState('mes_atual');
   const [selectedAccount, setSelectedAccount] = useState('todas');

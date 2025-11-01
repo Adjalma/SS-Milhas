@@ -44,8 +44,11 @@ import {
   Info
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
+import { movementAPI } from '../../services';
 
 const CompraEntrada = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [formData, setFormData] = useState({
     pessoa: '',
     programa: '',
@@ -59,7 +62,25 @@ const CompraEntrada = () => {
     senhaOrigem: ''
   });
 
-  const [movimentacoes, setMovimentacoes] = useState([
+  const [movimentacoes, setMovimentacoes] = useState([]);
+
+  const fetchMovimentacoes = async () => {
+    try {
+      setLoading(true);
+      const response = await movementAPI.getMovements({ tipo: 'compra' });
+      setMovimentacoes(response.movements || []);
+    } catch (err) {
+      setError('Erro ao carregar movimentações');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchMovimentacoes();
+  }, []);
+
+  const [movimentacoesOLD] = useState([
     {
       id: 1,
       pessoa: 'João Silva',

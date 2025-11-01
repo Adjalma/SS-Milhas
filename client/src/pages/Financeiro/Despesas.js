@@ -74,11 +74,14 @@ import {
   TrendingUp
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
+import { financialAPI } from '../../services';
 
 const Despesas = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
+  const [despesas, setDespesas] = useState([]);
+  const [error, setError] = useState(null);
   const [formData, setFormData] = useState({
     descricao: '',
     categoria: '',
@@ -94,8 +97,28 @@ const Despesas = () => {
     recorrente: false
   });
 
-  // Dados mockados baseados nas imagens
-  const [despesas] = useState([
+  // Buscar despesas do backend
+  const fetchDespesas = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await financialAPI.getExpenses();
+      setDespesas(response.expenses || []);
+    } catch (err) {
+      console.error('Erro ao buscar despesas:', err);
+      setError('Erro ao carregar despesas. Tente novamente.');
+      setDespesas([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchDespesas();
+  }, []);
+
+  // Dados mockados removidos - agora usa backend
+  const [despesasOLD] = useState([
     {
       id: 1,
       descricao: 'Compra de milhas LATAM Pass',
@@ -184,10 +207,16 @@ const Despesas = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setError(null);
     
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      console.log('Despesa registrada:', formData);
+      await financialAPI.createExpense({
+        tipo: 'despesa',
+        ...formData,
+        data: formData.dataVencimento
+      });
+      await fetchDespesas();
+      setOpenDialog(false);
       
       // Reset form
       setFormData({

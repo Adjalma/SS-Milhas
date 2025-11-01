@@ -68,10 +68,29 @@ import {
   Security
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
+import { movementAPI } from '../../services';
 
 const SaidaManual = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [saidas, setSaidas] = useState([]);
+
+  const fetchSaidas = async () => {
+    try {
+      setLoading(true);
+      const res = await movementAPI.getMovements({ tipo: 'saida_manual' });
+      setSaidas(res.movements || []);
+    } catch (err) {
+      setError('Erro ao carregar saídas');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchSaidas();
+  }, []);
   const [openDialog, setOpenDialog] = useState(false);
   const [formData, setFormData] = useState({
     pessoa: '',

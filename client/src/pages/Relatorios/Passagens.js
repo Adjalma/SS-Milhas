@@ -64,10 +64,29 @@ import {
 } from '@mui/icons-material';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, BarChart as RechartsBarChart, Bar, PieChart as RechartsPieChart, Cell } from 'recharts';
 import { useAuth } from '../../contexts/AuthContext';
+import { reportAPI } from '../../services';
 
 const Passagens = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [relatorio, setRelatorio] = useState({ passagens: [], totais: {} });
+
+  const fetchRelatorio = async () => {
+    try {
+      setLoading(true);
+      const res = await reportAPI.getTicketsReport();
+      setRelatorio(res);
+    } catch (err) {
+      setError('Erro ao carregar relatório');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchRelatorio();
+  }, []);
   const [viewType, setViewType] = useState('tabela'); // tabela, grafico
   const [chartType, setChartType] = useState('linha'); // linha, barra, pizza
   const [filters, setFilters] = useState({

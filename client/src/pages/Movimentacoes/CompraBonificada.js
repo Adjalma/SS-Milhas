@@ -56,10 +56,29 @@ import {
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
 import { motion } from 'framer-motion';
+import { movementAPI } from '../../services';
 
 const CompraBonificada = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [compras, setCompras] = useState([]);
+
+  const fetchCompras = async () => {
+    try {
+      setLoading(true);
+      const res = await movementAPI.getMovements({ tipo: 'compra_bonificada' });
+      setCompras(res.movements || []);
+    } catch (err) {
+      setError('Erro ao carregar compras');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchCompras();
+  }, []);
   const [formData, setFormData] = useState({
     pessoa: '',
     programa: '',

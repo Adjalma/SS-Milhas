@@ -70,10 +70,29 @@ import {
   Receipt
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
+import { financialAPI } from '../../services';
 
 const Transferencia = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [transferencias, setTransferencias] = useState([]);
+
+  const fetchTransferencias = async () => {
+    try {
+      setLoading(true);
+      const res = await financialAPI.getCashFlow({ tipo: 'transferencia' });
+      setTransferencias(res.cashFlow || []);
+    } catch (err) {
+      setError('Erro ao carregar transferências');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchTransferencias();
+  }, []);
   const [openDialog, setOpenDialog] = useState(false);
   const [formData, setFormData] = useState({
     tipo: 'entre_contas',

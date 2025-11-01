@@ -57,10 +57,29 @@ import {
 } from '@mui/icons-material';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, BarChart as RechartsBarChart, Bar, AreaChart, Area } from 'recharts';
 import { useAuth } from '../../contexts/AuthContext';
+import { reportAPI } from '../../services';
 
 const Resumo = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [resumo, setResumo] = useState({});
+
+  const fetchResumo = async () => {
+    try {
+      setLoading(true);
+      const res = await reportAPI.getSummaryReport();
+      setResumo(res);
+    } catch (err) {
+      setError('Erro ao carregar resumo');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchResumo();
+  }, []);
   const [periodo, setPeriodo] = useState('30dias');
 
   // Dados mockados baseados nas imagens

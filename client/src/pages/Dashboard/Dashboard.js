@@ -53,6 +53,7 @@ import {
 import { motion } from 'framer-motion';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { dashboardAPI, financialAPI } from '../../services';
 
 // Componente de Card de Métrica
 const MetricCard = ({ title, value, change, icon, color = 'primary', onClick }) => {

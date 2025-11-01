@@ -63,9 +63,11 @@ import {
   BarChart
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
+import { financialAPI } from '../../services';
 
 const FluxoCaixa = () => {
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [searchTerm, setSearchTerm] = useState('');
@@ -93,77 +95,26 @@ const FluxoCaixa = () => {
   useEffect(() => {
     const loadFluxoData = async () => {
       setLoading(true);
+      setError(null);
       
-      // Simular carregamento
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Gerar dados mockados
-      const movimentacoes = [];
-      const tipos = ['entrada', 'saida'];
-      const categorias = [
-        'Venda de Milhas', 'Compra de Milhas', 'Transferência', 'Taxa Bancária',
-        'Comissão', 'Reembolso', 'Depósito', 'Saque', 'Taxa de Programa'
-      ];
-      
-      const pessoas = [
-        'João Silva', 'Maria Santos', 'Pedro Oliveira', 'Ana Costa', 'Carlos Pereira'
-      ];
-
-      for (let i = 1; i <= 100; i++) {
-        const tipo = tipos[Math.floor(Math.random() * tipos.length)];
-        const categoria = categorias[Math.floor(Math.random() * categorias.length)];
-        const pessoa = pessoas[Math.floor(Math.random() * pessoas.length)];
-        const valor = Math.random() * 5000 + 100;
-        const data = new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000);
-        
-        movimentacoes.push({
-          id: i,
-          data: data,
-          tipo: tipo,
-          categoria: categoria,
-          descricao: `${tipo === 'entrada' ? 'Recebimento de' : 'Pagamento de'} ${categoria.toLowerCase()}`,
-          valor: tipo === 'entrada' ? valor : -valor,
-          pessoa: pessoa,
-          status: Math.random() > 0.1 ? 'confirmado' : 'pendente',
-          observacoes: tipo === 'saida' ? 'Taxa de processamento incluída' : '',
-          saldoAcumulado: 0 // Será calculado
+      try {
+        // Buscar dados reais do backend
+        const response = await financialAPI.getCashFlow({
+          period: filterPeriod
         });
+        
+        setFluxoData({
+          resumo: response.summary || fluxoData.resumo,
+          movimentacoes: response.cashFlow || [],
+          categorias: response.categories || fluxoData.categorias
+        });
+      } catch (err) {
+        console.error('Erro ao carregar fluxo de caixa:', err);
+        setError('Erro ao carregar dados do fluxo de caixa');
+        // Manter estrutura vazia em caso de erro
+      } finally {
+        setLoading(false);
       }
-
-      // Ordenar por data e calcular saldo acumulado
-      movimentacoes.sort((a, b) => new Date(a.data) - new Date(b.data));
-      
-      let saldoAcumulado = 50000; // Saldo inicial
-      movimentacoes.forEach(mov => {
-        saldoAcumulado += mov.valor;
-        mov.saldoAcumulado = saldoAcumulado;
-      });
-
-      // Calcular totais
-      const totalEntradas = movimentacoes
-        .filter(m => m.tipo === 'entrada')
-        .reduce((sum, m) => sum + Math.abs(m.valor), 0);
-      
-      const totalSaidas = movimentacoes
-        .filter(m => m.tipo === 'saida')
-        .reduce((sum, m) => sum + Math.abs(m.valor), 0);
-
-      setFluxoData({
-        resumo: {
-          saldoInicial: 50000,
-          totalEntradas: totalEntradas,
-          totalSaidas: totalSaidas,
-          saldoFinal: saldoAcumulado,
-          saldoProjetado: saldoAcumulado + (totalEntradas - totalSaidas) * 0.1
-        },
-        movimentacoes: movimentacoes,
-        categorias: {
-          entradas: ['Venda de Milhas', 'Reembolso', 'Depósito', 'Comissão'],
-          saidas: ['Compra de Milhas', 'Taxa Bancária', 'Taxa de Programa', 'Saque']
-        }
-      });
-      
-      setLoading(false);
     };
 
     loadFluxoData();

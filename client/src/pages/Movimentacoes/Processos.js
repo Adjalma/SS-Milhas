@@ -63,10 +63,29 @@ import {
   MoreVert
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
+import { movementAPI } from '../../services';
 
 const Processos = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [processos, setProcessos] = useState([]);
+
+  const fetchProcessos = async () => {
+    try {
+      setLoading(true);
+      const res = await movementAPI.getMovements({ tipo: 'processo' });
+      setProcessos(res.movements || []);
+    } catch (err) {
+      setError('Erro ao carregar processos');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchProcessos();
+  }, []);
   const [openDialog, setOpenDialog] = useState(false);
   const [formData, setFormData] = useState({
     titulo: '',

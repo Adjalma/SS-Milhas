@@ -58,10 +58,29 @@ import {
   PersonAdd
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
+import { movementAPI } from '../../services';
 
 const TransferenciaPessoas = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [transferencias, setTransferencias] = useState([]);
+
+  const fetchTransferencias = async () => {
+    try {
+      setLoading(true);
+      const res = await movementAPI.getMovements({ tipo: 'transferencia_pessoas' });
+      setTransferencias(res.movements || []);
+    } catch (err) {
+      setError('Erro ao carregar transferências');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchTransferencias();
+  }, []);
   const [formData, setFormData] = useState({
     pessoaOrigem: '',
     pessoaDestino: '',

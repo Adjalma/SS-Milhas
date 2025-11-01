@@ -68,10 +68,30 @@ import {
   Receipt
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
+import { movementAPI } from '../../services';
 
 const Venda = () => {
-  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [vendas, setVendas] = useState([]);
+
+  const fetchVendas = async () => {
+    try {
+      setLoading(true);
+      const res = await movementAPI.getMovements({ tipo: 'venda' });
+      setVendas(res.movements || []);
+    } catch (err) {
+      setError('Erro ao carregar vendas');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchVendas();
+  }, []);
+  
+  const { user } = useAuth();
   const [openDialog, setOpenDialog] = useState(false);
   const [formData, setFormData] = useState({
     pessoa: '',

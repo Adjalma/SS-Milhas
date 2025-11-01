@@ -59,10 +59,29 @@ import {
   ComposedChart, Legend
 } from 'recharts';
 import { useAuth } from '../../contexts/AuthContext';
+import { reportAPI } from '../../services';
 
 const GraficoLucro = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [lucro, setLucro] = useState({ dados: [], totais: {} });
+
+  const fetchLucro = async () => {
+    try {
+      setLoading(true);
+      const res = await reportAPI.getProfitReport();
+      setLucro(res);
+    } catch (err) {
+      setError('Erro ao carregar dados');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchLucro();
+  }, []);
   const [viewType, setViewType] = useState('linha'); // linha, barra, area, pizza
   const [periodo, setPeriodo] = useState('6meses');
   const [filtros, setFiltros] = useState({

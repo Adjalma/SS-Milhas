@@ -65,10 +65,29 @@ import {
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import { getAllCPFs, getCPFStats } from '../../data/cpfData';
+import { reportAPI } from '../../services';
 
 const ControleCPF = () => {
   const [cpfs, setCpfs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const fetchCPFs = async () => {
+    try {
+      setLoading(true);
+      const res = await reportAPI.getCPFControlReport();
+      setCpfs(res.cpfs || getAllCPFs());
+    } catch (err) {
+      setError('Erro ao carregar CPFs');
+      setCpfs(getAllCPFs()); // Fallback to mock data
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchCPFs();
+  }, []);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [searchTerm, setSearchTerm] = useState('');
@@ -78,21 +97,6 @@ const ControleCPF = () => {
   const [blockDialog, setBlockDialog] = useState(false);
 
   // Carregar dados da base centralizada
-  useEffect(() => {
-    const loadCPFData = async () => {
-      setLoading(true);
-      
-      // Simular carregamento
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      const cpfsData = getAllCPFs();
-      setCpfs(cpfsData);
-      setLoading(false);
-    };
-
-    loadCPFData();
-  }, []);
-
   // Filtrar CPFs
   const cpfsFiltrados = cpfs.filter(cpf => {
     const matchesSearch = cpf.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||

@@ -62,11 +62,18 @@ import {
   Stop
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
+import { taskAPI } from '../../services';
 
 const Tarefas = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
+  const [tarefas, setTarefas] = useState({
+    pendentes: [],
+    em_andamento: [],
+    concluidas: []
+  });
   const [filtros, setFiltros] = useState({
     status: 'todos',
     prioridade: 'todos',
@@ -74,8 +81,31 @@ const Tarefas = () => {
     categoria: 'todos'
   });
 
-  // Dados mockados baseados nas imagens
-  const [tarefas] = useState({
+  // Buscar tarefas do backend
+  const fetchTarefas = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await taskAPI.getKanbanTasks();
+      setTarefas({
+        pendentes: response.tasks?.filter(t => t.status === 'todo') || [],
+        em_andamento: response.tasks?.filter(t => t.status === 'in_progress') || [],
+        concluidas: response.tasks?.filter(t => t.status === 'done') || []
+      });
+    } catch (err) {
+      console.error('Erro ao buscar tarefas:', err);
+      setError('Erro ao carregar tarefas');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchTarefas();
+  }, []);
+
+  // Dados mockados REMOVIDOS
+  const [tarefasOLD] = useState({
     pendentes: [
       {
         id: 1,

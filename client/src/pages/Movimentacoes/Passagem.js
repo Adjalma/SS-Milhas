@@ -71,10 +71,29 @@ import {
   People
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
+import { movementAPI } from '../../services';
 
 const Passagem = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [passagens, setPassagens] = useState([]);
+
+  const fetchPassagens = async () => {
+    try {
+      setLoading(true);
+      const res = await movementAPI.getMovements({ tipo: 'passagem' });
+      setPassagens(res.movements || []);
+    } catch (err) {
+      setError('Erro ao carregar passagens');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchPassagens();
+  }, []);
   const [openDialog, setOpenDialog] = useState(false);
   const [formData, setFormData] = useState({
     pessoa: '',
