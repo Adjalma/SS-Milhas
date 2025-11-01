@@ -4,7 +4,7 @@ import axios from 'axios';
 const API_URL = process.env.REACT_APP_API_URL || 
                 (window.location.hostname === 'localhost' 
                   ? 'http://localhost:5000/api' 
-                  : 'https://web-production-8843.up.railway.app/api'); // Railway backend
+                  : `${window.location.protocol}//${window.location.hostname}/api`);
 
 // Log para debug
 console.log('🔍 CPFControlAPI URL:', API_URL);
