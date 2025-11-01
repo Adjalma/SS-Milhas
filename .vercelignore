@@ -23,7 +23,7 @@ server/ai/*.session
 # Uploads e dados temporários
 uploads/
 server/uploads/
-data/
+/data/
 
 # IDE
 .vscode/
