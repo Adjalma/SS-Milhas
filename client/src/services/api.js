@@ -15,7 +15,7 @@ import toast from 'react-hot-toast';
 const API_BASE_URL = process.env.REACT_APP_API_URL || 
   (window.location.hostname === 'localhost' 
     ? 'http://localhost:5000/api' 
-    : 'https://web-production-8843.up.railway.app/api');
+    : `${window.location.protocol}//${window.location.hostname}/api`);
 
 // Log para debug
 console.log('🔍 API_BASE_URL:', API_BASE_URL);
