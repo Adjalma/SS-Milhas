@@ -54,16 +54,40 @@ const financialRoutes = require('./routes/financial');
 const taskRoutes = require('./routes/tasks');
 const aiRoutes = require('./routes/ai');
 
-// Importar middlewares
+// Importar middlewares de erro e autenticação
 const { errorHandler } = require('./middleware/errorHandler');
 const { authMiddleware } = require('./middleware/auth');
+
+// Importar middlewares de segurança avançada
+const {
+  xssProtection,
+  pathTraversalProtection,
+  hppProtection,
+  additionalSecurityHeaders,
+  suspiciousActivityMiddleware,
+  validateContentType,
+  payloadSizeLimit,
+  csrfTokenGenerator,
+  loginLimiter,
+  registerLimiter,
+  passwordResetLimiter
+} = require('./middleware/security');
+
+// Importar sistema de logs
+const {
+  logger,
+  requestLogger,
+  errorLogger
+} = require('./utils/logger');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 // ==================== MIDDLEWARES DE SEGURANÇA ====================
 
-// Helmet para headers de segurança
+console.log('🔒 Inicializando middlewares de segurança...');
+
+// 1. Helmet para headers de segurança
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
@@ -75,47 +99,77 @@ app.use(helmet({
   },
 }));
 
-// CORS configurado para permitir apenas origens específicas
+// 2. Headers de segurança adicionais
+app.use(additionalSecurityHeaders);
+
+// 3. CORS configurado para permitir apenas origens específicas
 const corsOptions = {
   origin: process.env.NODE_ENV === 'production' 
     ? ['https://ss-milhas.vercel.app', 'https://ss-milhas.com.br', 'https://www.ss-milhas.com.br'] 
-    : ['http://localhost:3000'],
+    : ['http://localhost:3000', 'http://localhost:3001'],
   credentials: true,
-  optionsSuccessStatus: 200
+  optionsSuccessStatus: 200,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token']
 };
 app.use(cors(corsOptions));
 
-// Rate limiting para prevenir ataques
+// 4. Rate limiting global
 const limiter = rateLimit({
   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000, // 15 minutos
   max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100, // limite de 100 requests por IP
   message: {
+    success: false,
     error: 'Muitas tentativas. Tente novamente em 15 minutos.',
+    code: 'RATE_LIMIT_EXCEEDED',
     retryAfter: '15 minutes'
   },
   standardHeaders: true,
   legacyHeaders: false,
+  skip: (req) => {
+    // Pular rate limiting para health checks
+    return req.path === '/api/health';
+  }
 });
 app.use('/api/', limiter);
 
-// Sanitização contra NoSQL injection
+// 5. Sanitização contra NoSQL injection
 app.use(mongoSanitize());
+
+// 6. Proteção XSS
+app.use(xssProtection);
+
+// 7. Proteção contra Path Traversal
+app.use(pathTraversalProtection);
+
+// 8. Proteção HPP (HTTP Parameter Pollution)
+app.use(hppProtection);
+
+// 9. Detecção de atividades suspeitas
+app.use(suspiciousActivityMiddleware);
+
+// 10. Validação de Content-Type
+app.use(validateContentType(['application/json', 'multipart/form-data']));
+
+// 11. Limite de tamanho de payload
+app.use(payloadSizeLimit(10 * 1024 * 1024)); // 10MB
 
 // ==================== MIDDLEWARES GERAIS ====================
 
 // Compressão de respostas
 app.use(compression());
 
-// Logging de requisições
-if (process.env.NODE_ENV === 'development') {
-  app.use(morgan('dev'));
-} else {
-  app.use(morgan('combined'));
-}
+// Logging de requisições (Winston)
+app.use(requestLogger);
 
 // Parsing de JSON e URL-encoded
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Geração de tokens CSRF para requisições autenticadas
+app.use(csrfTokenGenerator);
+
+console.log('✅ Middlewares de segurança inicializados com sucesso!');
 
 // Servir arquivos estáticos
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));

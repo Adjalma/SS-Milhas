@@ -1,0 +1,646 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "SS Milhas API",
+    "version": "1.0.0",
+    "description": "API completa do Sistema de Gestão de Milhas Aéreas",
+    "contact": {
+      "name": "Suporte SS Milhas",
+      "email": "suporte@ssmilhas.com"
+    },
+    "license": {
+      "name": "Proprietary"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5000/api",
+      "description": "Servidor de Desenvolvimento"
+    },
+    {
+      "url": "https://ss-milhas.vercel.app/api",
+      "description": "Servidor de Produção"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Autenticação",
+      "description": "Endpoints de autenticação e autorização"
+    },
+    {
+      "name": "Usuários",
+      "description": "Gerenciamento de usuários"
+    },
+    {
+      "name": "Movimentações",
+      "description": "Gestão de movimentações de milhas"
+    },
+    {
+      "name": "Financeiro",
+      "description": "Gestão financeira"
+    },
+    {
+      "name": "Tarefas",
+      "description": "Sistema de tarefas e Kanban"
+    },
+    {
+      "name": "Dashboard",
+      "description": "Estatísticas e métricas"
+    },
+    {
+      "name": "IA",
+      "description": "Sistema de Inteligência Artificial"
+    }
+  ],
+  "paths": {
+    "/auth/login": {
+      "post": {
+        "tags": ["Autenticação"],
+        "summary": "Fazer login",
+        "description": "Autentica um usuário e retorna um token JWT",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "senha"],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "usuario@example.com"
+                  },
+                  "senha": {
+                    "type": "string",
+                    "format": "password",
+                    "example": "SenhaSegura123!@#"
+                  },
+                  "lembrarMe": {
+                    "type": "boolean",
+                    "default": false
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login bem-sucedido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "token": {
+                      "type": "string"
+                    },
+                    "user": {
+                      "$ref": "#/components/schemas/User"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimit"
+          }
+        }
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "tags": ["Autenticação"],
+        "summary": "Registrar novo usuário",
+        "description": "Cria uma nova conta de usuário",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["nome", "email", "senha"],
+                "properties": {
+                  "nome": {
+                    "type": "string",
+                    "example": "João Silva"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "joao@example.com"
+                  },
+                  "senha": {
+                    "type": "string",
+                    "format": "password",
+                    "example": "SenhaSegura123!@#"
+                  },
+                  "telefone": {
+                    "type": "string",
+                    "example": "11988888888"
+                  },
+                  "cpf": {
+                    "type": "string",
+                    "example": "12345678901"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Usuário registrado com sucesso"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimit"
+          }
+        }
+      }
+    },
+    "/users/profile": {
+      "get": {
+        "tags": ["Usuários"],
+        "summary": "Obter perfil do usuário",
+        "description": "Retorna os dados do perfil do usuário autenticado",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Perfil do usuário",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "user": {
+                      "$ref": "#/components/schemas/User"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      },
+      "put": {
+        "tags": ["Usuários"],
+        "summary": "Atualizar perfil",
+        "description": "Atualiza os dados do perfil do usuário",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nome": {
+                    "type": "string"
+                  },
+                  "telefone": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Perfil atualizado com sucesso"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/movements": {
+      "get": {
+        "tags": ["Movimentações"],
+        "summary": "Listar movimentações",
+        "description": "Retorna lista de movimentações com filtros e paginação",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "tipo",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["compra", "venda", "transferencia", "bonificacao", "expiracao", "estorno"]
+            }
+          },
+          {
+            "name": "programa",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["pendente", "confirmado", "cancelado"]
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de movimentações"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      },
+      "post": {
+        "tags": ["Movimentações"],
+        "summary": "Criar movimentação",
+        "description": "Cria uma nova movimentação de milhas",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MovementInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Movimentação criada com sucesso"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/financial/income": {
+      "get": {
+        "tags": ["Financeiro"],
+        "summary": "Listar receitas",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de receitas"
+          }
+        }
+      },
+      "post": {
+        "tags": ["Financeiro"],
+        "summary": "Criar receita",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FinancialTransactionInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Receita criada com sucesso"
+          }
+        }
+      }
+    },
+    "/tasks": {
+      "get": {
+        "tags": ["Tarefas"],
+        "summary": "Listar tarefas",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de tarefas"
+          }
+        }
+      },
+      "post": {
+        "tags": ["Tarefas"],
+        "summary": "Criar tarefa",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TaskInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Tarefa criada com sucesso"
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "tags": ["Sistema"],
+        "summary": "Health check",
+        "description": "Verifica o status da API",
+        "responses": {
+          "200": {
+            "description": "API funcionando corretamente"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "nome": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "role": {
+            "type": "string",
+            "enum": ["admin", "manager", "user"]
+          },
+          "status": {
+            "type": "string",
+            "enum": ["ativo", "inativo", "suspenso"]
+          },
+          "emailVerified": {
+            "type": "boolean"
+          },
+          "permissions": {
+            "type": "object",
+            "properties": {
+              "financeiro": {
+                "type": "boolean"
+              },
+              "valores": {
+                "type": "boolean"
+              },
+              "relatorios": {
+                "type": "boolean"
+              },
+              "monitoramento": {
+                "type": "boolean"
+              },
+              "cadastros": {
+                "type": "boolean"
+              }
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "MovementInput": {
+        "type": "object",
+        "required": ["tipo", "programa", "quantidade", "cpf"],
+        "properties": {
+          "tipo": {
+            "type": "string",
+            "enum": ["compra", "venda", "transferencia", "bonificacao", "expiracao", "estorno"]
+          },
+          "programa": {
+            "type": "string"
+          },
+          "quantidade": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "valorUnitario": {
+            "type": "number",
+            "minimum": 0
+          },
+          "valorTotal": {
+            "type": "number",
+            "minimum": 0
+          },
+          "cpf": {
+            "type": "string",
+            "pattern": "^[0-9]{11}$"
+          },
+          "descricao": {
+            "type": "string"
+          }
+        }
+      },
+      "FinancialTransactionInput": {
+        "type": "object",
+        "required": ["tipo", "categoria", "valor"],
+        "properties": {
+          "tipo": {
+            "type": "string",
+            "enum": ["receita", "despesa"]
+          },
+          "categoria": {
+            "type": "string"
+          },
+          "valor": {
+            "type": "number",
+            "minimum": 0
+          },
+          "descricao": {
+            "type": "string"
+          },
+          "data": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "TaskInput": {
+        "type": "object",
+        "required": ["titulo"],
+        "properties": {
+          "titulo": {
+            "type": "string"
+          },
+          "descricao": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["todo", "in_progress", "review", "done"]
+          },
+          "prioridade": {
+            "type": "string",
+            "enum": ["baixa", "media", "alta", "urgente"]
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "default": false
+          },
+          "message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "responses": {
+      "BadRequest": {
+        "description": "Requisição inválida",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Não autorizado",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Acesso negado",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "Recurso não encontrado",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "RateLimit": {
+        "description": "Limite de requisições excedido",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      }
+    }
+  }
+}
+

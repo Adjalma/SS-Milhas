@@ -1,0 +1,51 @@
+warning: in the working copy of 'server/services/emailService.js', LF will be replaced by CRLF the next time Git touches it
+[1mdiff --git a/server/services/emailService.js b/server/services/emailService.js[m
+[1mindex abdff61..835f96b 100644[m
+[1m--- a/server/services/emailService.js[m
+[1m+++ b/server/services/emailService.js[m
+[36m@@ -14,7 +14,12 @@[m [mconst path = require('path');[m
+ class EmailService {[m
+   constructor() {[m
+     this.transporter = null;[m
+[31m-    this.initializeTransporter();[m
+[32m+[m[32m    this.emailEnabled = String(process.env.EMAIL_ENABLED || '').toLowerCase() !== 'false';[m
+[32m+[m[32m    if (this.emailEnabled) {[m
+[32m+[m[32m      this.initializeTransporter();[m
+[32m+[m[32m    } else {[m
+[32m+[m[32m      console.log('✉️ Email desabilitado (EMAIL_ENABLED=false).');[m
+[32m+[m[32m    }[m
+   }[m
+ [m
+   /**[m
+[36m@@ -22,6 +27,7 @@[m [mclass EmailService {[m
+    */[m
+   initializeTransporter() {[m
+     try {[m
+[32m+[m[32m      if (!this.emailEnabled) return;[m
+       this.transporter = nodemailer.createTransport({[m
+         service: process.env.EMAIL_SERVICE || 'gmail',[m
+         auth: {[m
+[36m@@ -50,6 +56,7 @@[m [mclass EmailService {[m
+    * Enviar email de verificação[m
+    */[m
+   async sendVerificationEmail(email, token) {[m
+[32m+[m[32m    if (!this.emailEnabled) return;[m
+     const verificationUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/verificar-email?token=${token}`;[m
+     [m
+     const mailOptions = {[m
+[36m@@ -104,6 +111,7 @@[m [mclass EmailService {[m
+    * Enviar email de recuperação de senha[m
+    */[m
+   async sendPasswordResetEmail(email, token) {[m
+[32m+[m[32m    if (!this.emailEnabled) return;[m
+     const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/redefinir-senha?token=${token}`;[m
+     [m
+     const mailOptions = {[m
+[36m@@ -166,6 +174,7 @@[m [mclass EmailService {[m
+    * Enviar email de notificação[m
+    */[m
+   async sendNotificationEmail(email, subject, message, type = 'info') {[m
+[32m+[m[32m    if (!this.emailEnabled) return;[m
+     const colors = {[m
+       info: '#3B82F6',[m
+       success: '#10B981',[m

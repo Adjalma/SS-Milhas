@@ -10,7 +10,6 @@
 
 const express = require('express');
 const { body, validationResult } = require('express-validator');
-const rateLimit = require('express-rate-limit');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 
@@ -19,45 +18,26 @@ const { authMiddleware } = require('../middleware/auth');
 const { asyncHandler, createError, sanitizeInput } = require('../middleware/errorHandler');
 const emailService = require('../services/emailService');
 
+// Importar rate limiters e validações de segurança
+const {
+  loginLimiter,
+  registerLimiter,
+  passwordResetLimiter,
+  authDelayMiddleware
+} = require('../middleware/security');
+
+const {
+  validate,
+  authSchemas
+} = require('../middleware/validation');
+
+// Importar sistema de logs
+const {
+  logAuth,
+  logSuspiciousActivity
+} = require('../utils/logger');
+
 const router = express.Router();
-
-// ==================== RATE LIMITING ESPECÍFICO PARA AUTH ====================
-
-// Rate limiting mais restritivo para login
-const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 5, // máximo 5 tentativas por IP
-  message: {
-    success: false,
-    message: 'Muitas tentativas de login. Tente novamente em 15 minutos.',
-    code: 'LOGIN_RATE_LIMIT'
-  },
-  standardHeaders: true,
-  legacyHeaders: false,
-  skipSuccessfulRequests: true
-});
-
-// Rate limiting para registro
-const registerLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000, // 1 hora
-  max: 3, // máximo 3 registros por IP por hora
-  message: {
-    success: false,
-    message: 'Muitos registros. Tente novamente em 1 hora.',
-    code: 'REGISTER_RATE_LIMIT'
-  }
-});
-
-// Rate limiting para recuperação de senha
-const passwordResetLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000, // 1 hora
-  max: 3, // máximo 3 tentativas por IP por hora
-  message: {
-    success: false,
-    message: 'Muitas tentativas de recuperação. Tente novamente em 1 hora.',
-    code: 'PASSWORD_RESET_RATE_LIMIT'
-  }
-});
 
 // ==================== VALIDAÇÕES ====================
 
