@@ -22,6 +22,22 @@ async function connectDB() {
   return client;
 }
 
+// Helper para parsear body
+function parseBody(req) {
+  return new Promise((resolve, reject) => {
+    let body = '';
+    req.on('data', chunk => body += chunk.toString());
+    req.on('end', () => {
+      try {
+        resolve(body ? JSON.parse(body) : {});
+      } catch (e) {
+        reject(e);
+      }
+    });
+    req.on('error', reject);
+  });
+}
+
 module.exports = async (req, res) => {
   // CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -37,11 +53,11 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const client = await connectDB();
-    const db = client.db('ss_milhas');
-    const usersCollection = db.collection('users');
+    // Parse body
+    const body = req.body || await parseBody(req);
+    const { email, senha } = body;
 
-    const { email, senha } = req.body;
+    console.log('🔍 Login attempt:', { email, hasPassword: !!senha });
 
     if (!email || !senha) {
       return res.status(400).json({ 
@@ -50,13 +66,21 @@ module.exports = async (req, res) => {
       });
     }
 
+    // Conectar ao banco
+    const client = await connectDB();
+    const db = client.db('ss_milhas');
+    const usersCollection = db.collection('users');
+
     // Buscar usuário
     const user = await usersCollection.findOne({ 
       email: email.toLowerCase(), 
       ativo: true 
     });
 
+    console.log('👤 User found:', !!user);
+
     if (!user) {
+      console.log('❌ User not found or inactive');
       return res.status(401).json({ 
         success: false,
         message: 'Credenciais inválidas' 
@@ -65,6 +89,7 @@ module.exports = async (req, res) => {
 
     // Verificar senha
     const senhaValida = await bcrypt.compare(senha, user.senha);
+    console.log('🔒 Password valid:', senhaValida);
 
     if (!senhaValida) {
       return res.status(401).json({ 
@@ -73,12 +98,21 @@ module.exports = async (req, res) => {
       });
     }
 
+    // Verificar JWT_SECRET
+    if (!process.env.JWT_SECRET) {
+      console.error('❌ JWT_SECRET not configured!');
+      return res.status(500).json({ 
+        success: false,
+        message: 'Configuração do servidor incompleta' 
+      });
+    }
+
     // Gerar token
     const token = jwt.sign(
       { 
         id: user._id.toString(), 
         email: user.email,
-        role: user.role 
+        role: user.role || 'user'
       },
       process.env.JWT_SECRET,
       { expiresIn: '7d' }
@@ -90,6 +124,8 @@ module.exports = async (req, res) => {
       { $set: { ultimoLogin: new Date() } }
     );
 
+    console.log('✅ Login successful');
+
     return res.status(200).json({
       success: true,
       message: 'Login realizado com sucesso',
@@ -99,17 +135,18 @@ module.exports = async (req, res) => {
           id: user._id.toString(),
           nome: user.nome,
           email: user.email,
-          role: user.role
+          role: user.role || 'user'
         }
       }
     });
 
   } catch (error) {
-    console.error('Erro no login:', error);
+    console.error('❌ Erro no login:', error);
     return res.status(500).json({ 
       success: false,
       message: 'Erro ao processar login',
-      error: error.message 
+      error: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
     });
   }
 };
