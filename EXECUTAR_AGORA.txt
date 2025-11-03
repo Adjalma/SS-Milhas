@@ -1,0 +1,36 @@
+═══════════════════════════════════════════════════════
+  EXECUTE ESTES COMANDOS AGORA - CORREÇÃO FINAL
+═══════════════════════════════════════════════════════
+
+git add .
+git commit -m "fix: login serverless simplificado + debug endpoint"
+git push origin main
+
+═══════════════════════════════════════════════════════
+  APÓS 2 MINUTOS, TESTE:
+═══════════════════════════════════════════════════════
+
+1. https://ss-milhas.vercel.app/api/debug
+   (Deve mostrar informações do ambiente)
+
+2. https://ss-milhas.vercel.app/api/health
+   (Deve mostrar "ok")
+
+3. Tente fazer login no site
+
+═══════════════════════════════════════════════════════
+  SE AINDA DER ERRO 500:
+═══════════════════════════════════════════════════════
+
+Abra o console (F12) e execute:
+
+fetch('https://ss-milhas.vercel.app/api/debug', {
+  method: 'POST',
+  headers: {'Content-Type':'application/json'},
+  body: JSON.stringify({email:'teste@teste.com',senha:'123'})
+}).then(r=>r.json()).then(console.log)
+
+COPIE E COLE O RESULTADO AQUI!
+
+═══════════════════════════════════════════════════════
+
