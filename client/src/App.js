@@ -97,10 +97,15 @@ import Perfil from './pages/Configuracoes/Perfil';
 
 // Componente para rotas protegidas
 const ProtectedRoute = ({ children }) => {
-  const { user, loading } = useAuth();
+  const { user, loading, devMode } = useAuth();
 
-  if (loading) {
+  if (loading && !devMode) {
     return <LoadingScreen />;
+  }
+
+  // Em modo dev sem auth, sempre permite acesso
+  if (devMode) {
+    return children;
   }
 
   if (!user) {

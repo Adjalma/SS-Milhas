@@ -15,12 +15,32 @@ import toast from 'react-hot-toast';
 import { authAPI } from '../services/api';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
+// Modo de desenvolvimento sem autenticação
+const DEV_MODE_NO_AUTH = process.env.REACT_APP_NO_AUTH === 'true' || 
+                         (process.env.NODE_ENV === 'development' && localStorage.getItem('DEV_NO_AUTH') === 'true');
+
+// Usuário mock para desenvolvimento
+const MOCK_USER = {
+  _id: 'dev-user-123',
+  nome: 'Usuário Desenvolvimento',
+  email: 'dev@localhost',
+  role: 'admin',
+  status: 'ativo',
+  permissions: {
+    financeiro: true,
+    valores: true,
+    relatorios: true,
+    monitoramento: true,
+    cadastros: true
+  }
+};
+
 // Estado inicial
 const initialState = {
-  user: null,
-  token: null,
-  isAuthenticated: false,
-  loading: true,
+  user: DEV_MODE_NO_AUTH ? MOCK_USER : null,
+  token: DEV_MODE_NO_AUTH ? 'dev-token-mock' : null,
+  isAuthenticated: DEV_MODE_NO_AUTH,
+  loading: !DEV_MODE_NO_AUTH, // Se não precisa auth, não precisa carregar
 };
 
 // Tipos de ações
@@ -105,6 +125,13 @@ export const AuthProvider = ({ children }) => {
 
   // Verificar token no localStorage/cookies ao inicializar
   useEffect(() => {
+    // Se estiver em modo sem autenticação, não precisa inicializar
+    if (DEV_MODE_NO_AUTH) {
+      console.log('🔓 Modo de desenvolvimento SEM autenticação ativado');
+      dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false });
+      return;
+    }
+
     let isMounted = true;
     let timeoutId = null;
 
@@ -183,6 +210,15 @@ export const AuthProvider = ({ children }) => {
       }
     };
   }, []);
+
+  // Função para ativar/desativar modo sem autenticação (apenas dev)
+  const toggleDevMode = () => {
+    if (process.env.NODE_ENV === 'development') {
+      const currentMode = localStorage.getItem('DEV_NO_AUTH') === 'true';
+      localStorage.setItem('DEV_NO_AUTH', (!currentMode).toString());
+      window.location.reload();
+    }
+  };
 
   // Configurar axios com token
   useEffect(() => {
@@ -408,6 +444,7 @@ export const AuthProvider = ({ children }) => {
     token: state.token,
     isAuthenticated: state.isAuthenticated,
     loading: state.loading,
+    devMode: DEV_MODE_NO_AUTH,
     
     // Funções
     login,
@@ -419,6 +456,7 @@ export const AuthProvider = ({ children }) => {
     forgotPassword,
     resetPassword,
     resendVerification,
+    toggleDevMode, // Apenas em desenvolvimento
   };
 
   return (

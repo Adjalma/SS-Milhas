@@ -44,6 +44,7 @@ import { motion } from 'framer-motion';
 
 import { useAuth } from '../../contexts/AuthContext';
 import NeuralParticles from '../../components/NeuralParticles';
+import { useNavigate } from 'react-router-dom';
 
 // Schema de validação
 const schema = yup.object({
@@ -337,6 +338,38 @@ const Login = () => {
                     'Entrar'
                   )}
                 </Button>
+
+                {(process.env.NODE_ENV === 'development') && (
+                  <>
+                    <Divider sx={{ my: 2, borderColor: 'rgba(148, 163, 184, 0.1)' }}>
+                      <Typography variant="body2" color="text.secondary">
+                        ou
+                      </Typography>
+                    </Divider>
+
+                    <Button
+                      fullWidth
+                      variant="outlined"
+                      onClick={() => {
+                        localStorage.setItem('DEV_NO_AUTH', 'true');
+                        window.location.reload();
+                      }}
+                      sx={{
+                        py: 1.5,
+                        mb: 2,
+                        borderRadius: 2,
+                        borderColor: '#10B981',
+                        color: '#10B981',
+                        '&:hover': {
+                          borderColor: '#059669',
+                          backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        },
+                      }}
+                    >
+                      🔓 Acessar sem Login (Desenvolvimento)
+                    </Button>
+                  </>
+                )}
 
                 <Divider sx={{ my: 2, borderColor: 'rgba(148, 163, 184, 0.1)' }}>
                   <Typography variant="body2" color="text.secondary">
