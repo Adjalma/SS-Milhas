@@ -95,66 +95,20 @@ import GerenciarUsuarios from './pages/Configuracoes/GerenciarUsuarios';
 import Perfil from './pages/Configuracoes/Perfil';
 
 
-// Componente para rotas protegidas
+// Componente para rotas protegidas - SEMPRE permite acesso
 const ProtectedRoute = ({ children }) => {
-  const { user, loading, devMode } = useAuth();
-
-  if (loading && !devMode) {
-    return <LoadingScreen />;
-  }
-
-  // Em modo dev sem auth, sempre permite acesso
-  if (devMode) {
-    return children;
-  }
-
-  if (!user) {
-    return <Navigate to="/login" replace />;
-  }
-
+  // Autenticação removida - sempre permite acesso
   return children;
 };
 
-// Componente para rotas públicas (apenas quando não logado)
-const PublicRoute = ({ children }) => {
-  const { user, loading } = useAuth();
-
-  if (loading) {
-    return <LoadingScreen />;
-  }
-
-  if (user) {
-    return <Navigate to="/dashboard" replace />;
-  }
-
-  return children;
-};
+// PublicRoute removido - não é mais necessário
 
 function App() {
-  const { user, loading } = useAuth();
+  // Autenticação removida - sempre mostra a aplicação
+  const { loading } = useAuth();
 
-  // Timeout de segurança: se loading demorar muito, mostrar a aplicação
-  const [forceRender, setForceRender] = React.useState(false);
-  
-  React.useEffect(() => {
-    const timer = setTimeout(() => {
-      if (loading) {
-        console.warn('Loading demorou muito - forçando renderização');
-        setForceRender(true);
-      }
-    }, 6000); // 6 segundos
-
-    return () => clearTimeout(timer);
-  }, [loading]);
-
-  // Reset forceRender quando loading mudar
-  React.useEffect(() => {
-    if (!loading) {
-      setForceRender(false);
-    }
-  }, [loading]);
-
-  if (loading && !forceRender) {
+  // Se ainda estiver carregando (deve ser instantâneo), mostra loading
+  if (loading) {
     return <LoadingScreen />;
   }
 
@@ -293,11 +247,10 @@ function App() {
                       <Route path="/notifications" element={<Notifications />} />
                       
                       
-                      {/* Rota 404 */}
-                      <Route path="*" element={<Navigate to="/dashboard" replace />} />
-                    </Routes>
-                  </Layout>
-                </ProtectedRoute>
+                    {/* Rota 404 */}
+                    <Route path="*" element={<Navigate to="/dashboard" replace />} />
+                  </Routes>
+                </Layout>
               }
             />
           </Routes>

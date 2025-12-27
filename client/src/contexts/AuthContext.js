@@ -15,15 +15,12 @@ import toast from 'react-hot-toast';
 import { authAPI } from '../services/api';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
-// Modo de desenvolvimento sem autenticação
-const DEV_MODE_NO_AUTH = process.env.REACT_APP_NO_AUTH === 'true' || 
-                         (process.env.NODE_ENV === 'development' && localStorage.getItem('DEV_NO_AUTH') === 'true');
-
-// Usuário mock para desenvolvimento
+// SEM AUTENTICAÇÃO - Acesso direto ao sistema
+// Usuário mock sempre ativo
 const MOCK_USER = {
   _id: 'dev-user-123',
-  nome: 'Usuário Desenvolvimento',
-  email: 'dev@localhost',
+  nome: 'Usuário Sistema',
+  email: 'sistema@localhost',
   role: 'admin',
   status: 'ativo',
   permissions: {
@@ -35,12 +32,12 @@ const MOCK_USER = {
   }
 };
 
-// Estado inicial
+// Estado inicial - sempre logado
 const initialState = {
-  user: DEV_MODE_NO_AUTH ? MOCK_USER : null,
-  token: DEV_MODE_NO_AUTH ? 'dev-token-mock' : null,
-  isAuthenticated: DEV_MODE_NO_AUTH,
-  loading: !DEV_MODE_NO_AUTH, // Se não precisa auth, não precisa carregar
+  user: MOCK_USER,
+  token: 'dev-token-mock',
+  isAuthenticated: true,
+  loading: false, // Não precisa carregar nada
 };
 
 // Tipos de ações
@@ -123,92 +120,10 @@ export const AuthProvider = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
   const queryClient = useQueryClient();
 
-  // Verificar token no localStorage/cookies ao inicializar
+  // Autenticação desativada - sempre logado automaticamente
   useEffect(() => {
-    // Se estiver em modo sem autenticação, não precisa inicializar
-    if (DEV_MODE_NO_AUTH) {
-      console.log('🔓 Modo de desenvolvimento SEM autenticação ativado');
-      dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false });
-      return;
-    }
-
-    let isMounted = true;
-    let timeoutId = null;
-
-    const initializeAuth = async () => {
-      try {
-        const token = localStorage.getItem('token') || Cookies.get('token');
-        
-        // Timeout de segurança: sempre define loading como false após 5 segundos
-        timeoutId = setTimeout(() => {
-          if (isMounted) {
-            console.warn('Timeout na inicialização da autenticação - definindo loading como false');
-            dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false });
-          }
-        }, 5000);
-
-        if (token) {
-          try {
-            // Verificar se o token é válido com timeout
-            const timeoutPromise = new Promise((_, reject) =>
-              setTimeout(() => reject(new Error('Timeout')), 3000)
-            );
-            
-            const apiPromise = authAPI.getMe();
-            const response = await Promise.race([apiPromise, timeoutPromise]);
-            
-            if (isMounted) {
-              clearTimeout(timeoutId);
-              
-              if (response?.data?.success) {
-                dispatch({
-                  type: AUTH_ACTIONS.LOGIN_SUCCESS,
-                  payload: {
-                    user: response.data.data.user,
-                    token,
-                  },
-                });
-              } else {
-                // Token inválido, remover
-                localStorage.removeItem('token');
-                Cookies.remove('token');
-                dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false });
-              }
-            }
-          } catch (apiError) {
-            // Se não conseguir conectar com a API, apenas define loading como false
-            // Não remove o token para não perder a sessão se for problema temporário
-            if (isMounted) {
-              clearTimeout(timeoutId);
-              console.warn('Não foi possível verificar token com o servidor:', apiError.message);
-              dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false });
-            }
-          }
-        } else {
-          if (isMounted) {
-            clearTimeout(timeoutId);
-            dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false });
-          }
-        }
-      } catch (error) {
-        console.error('Erro ao inicializar autenticação:', error);
-        // Não remove tokens em caso de erro, apenas define loading como false
-        if (isMounted) {
-          clearTimeout(timeoutId);
-          dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false });
-        }
-      }
-    };
-
-    initializeAuth();
-
-    // Cleanup
-    return () => {
-      isMounted = false;
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
-    };
+    console.log('🔓 Sistema configurado para acesso direto (sem autenticação)');
+    dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false });
   }, []);
 
   // Função para ativar/desativar modo sem autenticação (apenas dev)
