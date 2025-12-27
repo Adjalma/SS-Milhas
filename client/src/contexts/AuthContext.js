@@ -359,7 +359,6 @@ export const AuthProvider = ({ children }) => {
     token: state.token,
     isAuthenticated: state.isAuthenticated,
     loading: state.loading,
-    devMode: DEV_MODE_NO_AUTH,
     
     // Funções
     login,
@@ -371,7 +370,6 @@ export const AuthProvider = ({ children }) => {
     forgotPassword,
     resetPassword,
     resendVerification,
-    toggleDevMode, // Apenas em desenvolvimento
   };
 
   return (
