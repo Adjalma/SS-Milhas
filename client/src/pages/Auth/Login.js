@@ -44,7 +44,6 @@ import { motion } from 'framer-motion';
 
 import { useAuth } from '../../contexts/AuthContext';
 import NeuralParticles from '../../components/NeuralParticles';
-import { useNavigate } from 'react-router-dom';
 
 // Schema de validação
 const schema = yup.object({
