@@ -128,7 +128,28 @@ const PublicRoute = ({ children }) => {
 function App() {
   const { user, loading } = useAuth();
 
-  if (loading) {
+  // Timeout de segurança: se loading demorar muito, mostrar a aplicação
+  const [forceRender, setForceRender] = React.useState(false);
+  
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      if (loading) {
+        console.warn('Loading demorou muito - forçando renderização');
+        setForceRender(true);
+      }
+    }, 6000); // 6 segundos
+
+    return () => clearTimeout(timer);
+  }, [loading]);
+
+  // Reset forceRender quando loading mudar
+  React.useEffect(() => {
+    if (!loading) {
+      setForceRender(false);
+    }
+  }, [loading]);
+
+  if (loading && !forceRender) {
     return <LoadingScreen />;
   }
 

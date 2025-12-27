@@ -105,54 +105,95 @@ export const AuthProvider = ({ children }) => {
 
   // Verificar token no localStorage/cookies ao inicializar
   useEffect(() => {
+    let isMounted = true;
+    let timeoutId = null;
+
     const initializeAuth = async () => {
       try {
         const token = localStorage.getItem('token') || Cookies.get('token');
         
+        // Timeout de segurança: sempre define loading como false após 5 segundos
+        timeoutId = setTimeout(() => {
+          if (isMounted) {
+            console.warn('Timeout na inicialização da autenticação - definindo loading como false');
+            dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false });
+          }
+        }, 5000);
+
         if (token) {
           try {
-            // Verificar se o token é válido
-            const response = await authAPI.getMe();
+            // Verificar se o token é válido com timeout
+            const timeoutPromise = new Promise((_, reject) =>
+              setTimeout(() => reject(new Error('Timeout')), 3000)
+            );
             
-            if (response?.data?.success) {
-              dispatch({
-                type: AUTH_ACTIONS.LOGIN_SUCCESS,
-                payload: {
-                  user: response.data.data.user,
-                  token,
-                },
-              });
-            } else {
-              // Token inválido, remover
-              localStorage.removeItem('token');
-              Cookies.remove('token');
-              dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false });
+            const apiPromise = authAPI.getMe();
+            const response = await Promise.race([apiPromise, timeoutPromise]);
+            
+            if (isMounted) {
+              clearTimeout(timeoutId);
+              
+              if (response?.data?.success) {
+                dispatch({
+                  type: AUTH_ACTIONS.LOGIN_SUCCESS,
+                  payload: {
+                    user: response.data.data.user,
+                    token,
+                  },
+                });
+              } else {
+                // Token inválido, remover
+                localStorage.removeItem('token');
+                Cookies.remove('token');
+                dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false });
+              }
             }
           } catch (apiError) {
             // Se não conseguir conectar com a API, apenas define loading como false
             // Não remove o token para não perder a sessão se for problema temporário
-            console.warn('Não foi possível verificar token com o servidor:', apiError.message);
-            dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false });
+            if (isMounted) {
+              clearTimeout(timeoutId);
+              console.warn('Não foi possível verificar token com o servidor:', apiError.message);
+              dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false });
+            }
           }
         } else {
-          dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false });
+          if (isMounted) {
+            clearTimeout(timeoutId);
+            dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false });
+          }
         }
       } catch (error) {
         console.error('Erro ao inicializar autenticação:', error);
         // Não remove tokens em caso de erro, apenas define loading como false
-        dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false });
+        if (isMounted) {
+          clearTimeout(timeoutId);
+          dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false });
+        }
       }
     };
 
     initializeAuth();
+
+    // Cleanup
+    return () => {
+      isMounted = false;
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
   }, []);
 
   // Configurar axios com token
   useEffect(() => {
-    if (state.token) {
-      authAPI.setAuthToken(state.token);
-    } else {
-      authAPI.removeAuthToken();
+    try {
+      if (state.token && authAPI.setAuthToken) {
+        authAPI.setAuthToken(state.token);
+      } else if (authAPI.removeAuthToken) {
+        authAPI.removeAuthToken();
+      }
+    } catch (error) {
+      console.error('Erro ao configurar token:', error);
     }
   }, [state.token]);
 
