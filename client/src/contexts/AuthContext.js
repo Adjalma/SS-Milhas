@@ -110,31 +110,37 @@ export const AuthProvider = ({ children }) => {
         const token = localStorage.getItem('token') || Cookies.get('token');
         
         if (token) {
-          // Verificar se o token é válido
-          const response = await authAPI.getMe();
-          
-          if (response.data.success) {
-            dispatch({
-              type: AUTH_ACTIONS.LOGIN_SUCCESS,
-              payload: {
-                user: response.data.data.user,
-                token,
-              },
-            });
-          } else {
-            // Token inválido, remover
-            localStorage.removeItem('token');
-            Cookies.remove('token');
-            dispatch({ type: AUTH_ACTIONS.LOGOUT });
+          try {
+            // Verificar se o token é válido
+            const response = await authAPI.getMe();
+            
+            if (response?.data?.success) {
+              dispatch({
+                type: AUTH_ACTIONS.LOGIN_SUCCESS,
+                payload: {
+                  user: response.data.data.user,
+                  token,
+                },
+              });
+            } else {
+              // Token inválido, remover
+              localStorage.removeItem('token');
+              Cookies.remove('token');
+              dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false });
+            }
+          } catch (apiError) {
+            // Se não conseguir conectar com a API, apenas define loading como false
+            // Não remove o token para não perder a sessão se for problema temporário
+            console.warn('Não foi possível verificar token com o servidor:', apiError.message);
+            dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false });
           }
         } else {
           dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false });
         }
       } catch (error) {
         console.error('Erro ao inicializar autenticação:', error);
-        localStorage.removeItem('token');
-        Cookies.remove('token');
-        dispatch({ type: AUTH_ACTIONS.LOGOUT });
+        // Não remove tokens em caso de erro, apenas define loading como false
+        dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false });
       }
     };
 
