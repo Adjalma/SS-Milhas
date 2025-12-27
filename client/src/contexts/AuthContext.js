@@ -126,15 +126,6 @@ export const AuthProvider = ({ children }) => {
     dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false });
   }, []);
 
-  // Função para ativar/desativar modo sem autenticação (apenas dev)
-  const toggleDevMode = () => {
-    if (process.env.NODE_ENV === 'development') {
-      const currentMode = localStorage.getItem('DEV_NO_AUTH') === 'true';
-      localStorage.setItem('DEV_NO_AUTH', (!currentMode).toString());
-      window.location.reload();
-    }
-  };
-
   // Configurar axios com token
   useEffect(() => {
     try {
