@@ -90,13 +90,7 @@ import GerenciarUsuarios from './pages/Configuracoes/GerenciarUsuarios';
 import Perfil from './pages/Configuracoes/Perfil';
 
 
-// Componente para rotas protegidas - SEMPRE permite acesso
-const ProtectedRoute = ({ children }) => {
-  // Autenticação removida - sempre permite acesso
-  return children;
-};
-
-// PublicRoute removido - não é mais necessário
+// Autenticação removida - acesso direto ao sistema
 
 function App() {
   // Autenticação removida - sempre mostra a aplicação
@@ -114,55 +108,19 @@ function App() {
         <Router>
           <Box sx={{ display: 'flex', minHeight: '100vh' }}>
           <Routes>
-            {/* Rotas públicas */}
-            <Route
-              path="/login"
-              element={
-                <PublicRoute>
-                  <Login />
-                </PublicRoute>
-              }
-            />
-            <Route
-              path="/register"
-              element={
-                <PublicRoute>
-                  <Register />
-                </PublicRoute>
-              }
-            />
-            <Route
-              path="/forgot-password"
-              element={
-                <PublicRoute>
-                  <ForgotPassword />
-                </PublicRoute>
-              }
-            />
-            <Route
-              path="/reset-password"
-              element={
-                <PublicRoute>
-                  <ResetPassword />
-                </PublicRoute>
-              }
-            />
-            <Route
-              path="/verify-email"
-              element={
-                <PublicRoute>
-                  <VerifyEmail />
-                </PublicRoute>
-              }
-            />
+            {/* Rotas de autenticação redirecionadas para dashboard */}
+            <Route path="/login" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/register" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/forgot-password" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/reset-password" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/verify-email" element={<Navigate to="/dashboard" replace />} />
 
-            {/* Rotas protegidas */}
+            {/* Todas as rotas acessíveis diretamente */}
             <Route
               path="/*"
               element={
-                <ProtectedRoute>
-                  <Layout>
-                    <Routes>
+                <Layout>
+                  <Routes>
                       <Route path="/" element={<Navigate to="/dashboard" replace />} />
                       <Route path="/dashboard" element={<Dashboard />} />
                       <Route path="/dashboard/controle-programas" element={<ControleProgramas />} />
@@ -242,12 +200,12 @@ function App() {
                       <Route path="/notifications" element={<Notifications />} />
                       
                       
-                    {/* Rota 404 */}
-                    <Route path="*" element={<Navigate to="/dashboard" replace />} />
-                  </Routes>
-                </Layout>
-              }
-            />
+                      {/* Rota 404 */}
+                      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+                    </Routes>
+                  </Layout>
+                }
+              />
           </Routes>
           </Box>
         </Router>
