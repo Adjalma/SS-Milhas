@@ -19,12 +19,7 @@ import Layout from './components/Layout/Layout';
 import LoadingScreen from './components/Common/LoadingScreen';
 import ErrorBoundary from './components/Common/ErrorBoundary';
 
-// Páginas de autenticação
-import Login from './pages/Auth/Login';
-import Register from './pages/Auth/Register';
-import ForgotPassword from './pages/Auth/ForgotPassword';
-import ResetPassword from './pages/Auth/ResetPassword';
-import VerifyEmail from './pages/Auth/VerifyEmail';
+// Páginas de autenticação removidas - acesso direto ao sistema
 
 // Páginas principais
 import Dashboard from './pages/Dashboard/Dashboard';
